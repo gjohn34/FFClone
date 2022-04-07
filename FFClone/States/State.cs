@@ -7,13 +7,15 @@ namespace FFClone
     public abstract class State
     {
         #region Fields
-        private Game _game;
-        private GraphicsDevice _graphicsDevice;
-        private ContentManager _content;
+        protected Game _game;
+        protected GraphicsDevice _graphicsDevice;
+        protected ContentManager _content;
         #endregion
         public State(Game1 game, GraphicsDevice graphicsDevice, ContentManager content)
         {
-
+            _game = game;
+            _graphicsDevice = graphicsDevice;
+            _content = content;
         }
         public abstract void Update(GameTime gameTime);
         public abstract void Draw(GameTime gameTime, SpriteBatch spriteBatch);
