@@ -1,4 +1,5 @@
 ﻿using FFClone.States;
+using FFClone.Transitions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -34,7 +35,7 @@ namespace FFClone
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _stateManager = StateManager.Instance;
-            _stateManager.Next(new MainMenuState(this, GraphicsDevice, Content));
+            _stateManager.Next(new MainMenuState(this, GraphicsDevice, Content), new FadeIn(240, new Rectangle(0,0, Window.ClientBounds.Width, Window.ClientBounds.Height)));
 
             // TODO: use this.Content to load your game content here
         }
