@@ -196,7 +196,7 @@ namespace FFClone.States
             switch (option)
             {
                 case "New":
-                    StateManager.Instance.Next(new GameState(_game, _graphicsDevice, _content), new NoTransition(0, Rectangle.Empty));
+                    StateManager.Instance.Next(new GameState(_game, _graphicsDevice, _content), new NoTransition());
                     break;
                 case "Load":
                     Debug.WriteLine("Load selected");

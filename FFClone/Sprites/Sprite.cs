@@ -10,6 +10,7 @@ namespace FFClone.Sprites
     public class Sprite
     {
         protected Texture2D _texture;
+        public Texture2D Texture { get { return _texture; } }
         protected Vector2 _position = Vector2.Zero;
         public Vector2 Position
         {

@@ -18,6 +18,23 @@ namespace FFClone.Sprites
         private int _currentFrame = 0;
         private int _totalFrames;
         private int _tick = 0;
+        private int _width;
+        private int _height;
+
+        public int Width
+        {
+            get
+            {
+                return _width;
+            }
+        }
+        public int Height
+        {
+            get
+            {
+                return _height;
+            }
+        }
         public int Rows { get; set; }
         public int Columns { get; set; }
         public Facing Facing = Facing.Down;
@@ -28,6 +45,8 @@ namespace FFClone.Sprites
             Rows = rows;
             Columns = columns;
             _totalFrames = rows * columns;
+            _width = _texture.Width / Columns;
+            _height = _texture.Height / Rows;
         }
 
         public override void Update(GameTime gameTime)
@@ -55,8 +74,6 @@ namespace FFClone.Sprites
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            int width = _texture.Width / Columns;
-            int height = _texture.Height / Rows;
             int row = 0;
             switch (Facing)
             {
@@ -77,8 +94,8 @@ namespace FFClone.Sprites
             }
             int column = _currentFrame % Columns;
 
-            Rectangle sourceRectangle = new Rectangle(width * column, height * row, width, height);
-            Rectangle destinationRectangle = new Rectangle((int)_position.X, (int)_position.Y, width, height);
+            Rectangle sourceRectangle = new Rectangle(_width * column, _height * row, _width, _height);
+            Rectangle destinationRectangle = new Rectangle((int)_position.X, (int)_position.Y, _width, _height);
 
             spriteBatch.Begin();
             spriteBatch.Draw(_texture, destinationRectangle, sourceRectangle, Color.White);

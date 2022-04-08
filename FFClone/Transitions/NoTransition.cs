@@ -8,7 +8,7 @@ namespace FFClone.Transitions
 {
     public class NoTransition : Transition
     {
-        public NoTransition(int totalFrames, Rectangle rectangle) : base(totalFrames, rectangle)
+        public NoTransition() : base(0, Rectangle.Empty)
         {
         }
 
