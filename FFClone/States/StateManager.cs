@@ -2,6 +2,7 @@
 using FFClone.Transitions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 
 namespace FFClone
 {
@@ -17,7 +18,6 @@ namespace FFClone
         private static readonly object padlock = new object();
         private static State _current;
         private static State _next;
-        private int _frame = 0;
         private Animation _animation = Animation.None;
         private Transition _transition;
         StateManager()
@@ -72,6 +72,11 @@ namespace FFClone
                 default:
                     break;
             }
+        }
+
+        internal void Resized()
+        {
+            _current.Resized();
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)

@@ -1,4 +1,5 @@
 ﻿using FFClone.Controls;
+using FFClone.Transitions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -67,16 +68,9 @@ namespace FFClone.States
         public MenuList(List<string> menuItems, Rectangle rectangle, SpriteFont spriteFont)
         {
             Rectangle = rectangle;
-            int spaceBetween = rectangle.Height / menuItems.Count;
-            int cellHeight = (int)Math.Ceiling((0.75 * spaceBetween));
             foreach (string option in menuItems)
             {
-                int initialYPos = menuItems.IndexOf(option) * spaceBetween;
-                double cellPositionPercentage = (double)menuItems.IndexOf(option) / (double)(menuItems.Count - 1);
-                int pushDown = (int)(cellPositionPercentage * cellHeight);
-                int pushDown2 = (int)(cellPositionPercentage * spaceBetween);
-                Rectangle r = new Rectangle(rectangle.X, initialYPos - pushDown + pushDown2, 200, cellHeight);
-                MenuItems.Add(new MenuItem(option, r, spriteFont, Color.Gray));
+                MenuItems.Add(new MenuItem(option, GeneratePosition(menuItems.IndexOf(option), menuItems.Count), spriteFont, Color.Gray));
             }
             MenuItems[Selected].Selected = true;
         }
@@ -86,6 +80,28 @@ namespace FFClone.States
                 menuItem.Draw(gameTime, spriteBatch);
 
             //_selector.Draw(gameTime, spriteBatch);
+        }
+        public void Resized(Rectangle clientBounds)
+        {
+            foreach (MenuItem menuItem in MenuItems)
+            {
+                menuItem.Rectangle = GeneratePosition(MenuItems.IndexOf(menuItem), MenuItems.Count);
+                //menuItem.Rectangle = new Rectangle(Rectangle.X - menuItem.Rectangle.Width, menuItem.Rectangle.Y, Rectangle.Width, menuItem.Rectangle.Height);
+                //menuItem.Rectangle = new Rectangle(clientBounds.X - menuItem.Rectangle.Width, menuItem.Rectangle.Y, menuItem.Rectangle.Width, menuItem.Rectangle.Height);
+
+            }
+        }
+        private Rectangle GeneratePosition(int index, int length)
+        {
+
+            int spaceBetween = Rectangle.Height / length;
+            int cellHeight = (int)Math.Ceiling((0.75 * spaceBetween));
+
+            int initialYPos = index * spaceBetween;
+            double cellPositionPercentage = (double)index / (double)(length - 1);
+            int pushDown = (int)(cellPositionPercentage * cellHeight);
+            int pushDown2 = (int)(cellPositionPercentage * spaceBetween);
+            return new Rectangle(Rectangle.X, initialYPos - pushDown + pushDown2, Rectangle.Width, cellHeight);
         }
 
         public void Update(GameTime gameTime)
@@ -161,8 +177,9 @@ namespace FFClone.States
         {
             _font = content.Load<SpriteFont>("Font/font");
             List<string> options = new List<string> { "New", "Load", "Help", "foo" };
-            //_selector = new Triangle(new Vector2(item.X - 50, item.Y + (int)Math.Ceiling((double)0.5 * item.Height)), new Point(100, (int)Math.Ceiling(0.25 * _cellHeight)));
-            _menuList = new MenuList(options, new Rectangle(_game.Window.ClientBounds.Width - 200, 0, 200, game.Window.ClientBounds.Height), _font);
+
+            int width = (int)Math.Ceiling(_game.Window.ClientBounds.Width * 0.2);
+            _menuList = new MenuList(options, new Rectangle(_game.Window.ClientBounds.Width - width, 0, width, _game.Window.ClientBounds.Height), _font);
             foreach (MenuItem item in _menuList.MenuItems)
             {
                 item.Touch += (a, b) => ChangeState(a, b, item.Text); 
@@ -179,7 +196,7 @@ namespace FFClone.States
             switch (option)
             {
                 case "New":
-                    Debug.WriteLine("New selected");
+                    StateManager.Instance.Next(new GameState(_game, _graphicsDevice, _content), new NoTransition(0, Rectangle.Empty));
                     break;
                 case "Load":
                     Debug.WriteLine("Load selected");
@@ -196,8 +213,13 @@ namespace FFClone.States
         public override void Update(GameTime gameTime)
         {
             _menuList.Update(gameTime);
-            //Rectangle item = _menuItems[_selected];
-            //_selector = new Triangle(new Vector2(item.X - 50, item.Y + (int)Math.Ceiling((double)0.5 * item.Height)), new Point(100, (int)Math.Ceiling(0.25 * _cellHeight)));
+        }
+
+        public override void Resized()
+        {
+            int width = (int)Math.Ceiling(_game.Window.ClientBounds.Width * 0.2);
+            _menuList.Rectangle = new Rectangle(_game.Window.ClientBounds.Width - width, 0, width, _game.Window.ClientBounds.Height);
+            _menuList.Resized(_game.Window.ClientBounds);
         }
     }
 }

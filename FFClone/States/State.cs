@@ -1,13 +1,14 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 
 namespace FFClone
 {
     public abstract class State
     {
         #region Fields
-        protected Game _game;
+        protected Game1 _game;
         protected GraphicsDevice _graphicsDevice;
         protected ContentManager _content;
         #endregion
@@ -20,5 +21,6 @@ namespace FFClone
         public abstract void Update(GameTime gameTime);
         public abstract void Draw(GameTime gameTime, SpriteBatch spriteBatch);
 
+        public abstract void Resized();
     }
 }
