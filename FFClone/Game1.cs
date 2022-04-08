@@ -23,7 +23,9 @@ namespace FFClone
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-
+            IsFixedTimeStep = true;
+            TargetElapsedTime = System.TimeSpan.FromSeconds(1d / 24);
+            Window.ClientSizeChanged += Window_ClientSizeChanged;
             //_graphics.IsFullScreen = false;
             //_graphics.PreferredBackBufferWidth = 1000;
             //_graphics.PreferredBackBufferHeight = 1000;
@@ -31,11 +33,16 @@ namespace FFClone
             base.Initialize();
         }
 
+        private void Window_ClientSizeChanged(object sender, System.EventArgs e)
+        {
+            _stateManager.Resized();
+        }
+
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _stateManager = StateManager.Instance;
-            _stateManager.Next(new MainMenuState(this, GraphicsDevice, Content), new FadeIn(240, new Rectangle(0,0, Window.ClientBounds.Width, Window.ClientBounds.Height)));
+            _stateManager.Next(new MainMenuState(this, GraphicsDevice, Content), new FadeIn(60, new Rectangle(0,0, Window.ClientBounds.Width, Window.ClientBounds.Height)));
 
             // TODO: use this.Content to load your game content here
         }
