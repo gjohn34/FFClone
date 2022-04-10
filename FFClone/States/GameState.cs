@@ -1,15 +1,19 @@
-﻿using FFClone.Sprites;
+﻿using FFClone.Controls;
+using FFClone.Sprites;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace FFClone.States
 {
     public class GameState : State
     {
+        private Stack<IComponent> _stack = new Stack<IComponent>();
         private Texture2D _background;
         private Rectangle _mapRectangle;
         private PlayerSprite _player;
@@ -31,6 +35,11 @@ namespace FFClone.States
             spriteBatch.End();
 
             _player.Draw(spriteBatch);
+
+            if (_stack.Count > 0)
+            {
+                _stack.Peek().Draw(gameTime, spriteBatch);
+            }
             //Primitives2D.DrawRectangle(spriteBatch, new Rectangle(0, 0, 200, 200), Color.Black);
         }
 
@@ -41,11 +50,27 @@ namespace FFClone.States
         public override void Update(GameTime gameTime)
         {
             KeyboardState keyboardState = Keyboard.GetState();
+            if (_stack.Count > 0)
+            {
+
+                if (keyboardState.IsKeyDown(Keys.Escape)){
+                    _stack.Pop();
+                    return;
+                }
+                _stack.Peek().Update(gameTime);
+                return;
+            }
             bool playing = true;
             Vector2 velocity = Vector2.Zero;
             int speed = 4;
             Facing facing = _player.Facing;
             bool charMove = false;
+            if (keyboardState.IsKeyDown(Keys.Enter))
+            {
+                int width = (int)Math.Ceiling(_vW* 0.2);
+                _stack.Push(new MenuList(new List<string> { "Party", "Items", "Config"}, new Rectangle(_vW - width, 0, width, _vH), _font));
+                // open up menu
+            }
             if (keyboardState.IsKeyDown(Keys.Up))
             {
                 if (_mapRectangle.Y == 0
