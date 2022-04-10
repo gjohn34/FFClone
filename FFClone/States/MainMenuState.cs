@@ -43,7 +43,7 @@ namespace FFClone.States
 
         public MainMenuState(Game1 game, GraphicsDevice graphicsDevice, ContentManager content) : base(game, graphicsDevice, content)
         {
-            List<string> options = new List<string> { "New", "Load", "Help", "foo" };
+            List<string> options = new List<string> { "New", "Load", "Help", "Credit" };
 
             int width = (int)Math.Ceiling(_game.Window.ClientBounds.Width * 0.2);
             _menuList = new MenuList(options, new Rectangle(_game.Window.ClientBounds.Width - width, 0, width, _game.Window.ClientBounds.Height), _font);
@@ -63,13 +63,16 @@ namespace FFClone.States
             switch (option)
             {
                 case "New":
-                    StateManager.Instance.Next(new GameState(_game, _graphicsDevice, _content), Transition.NoTransition);
+                    _stateManager.Next(new GameState(_game, _graphicsDevice, _content), Transition.NoTransition);
                     break;
                 case "Load":
                     Debug.WriteLine("Load selected");
                     break;
                 case "Help":
                     Debug.WriteLine("Help selected");
+                    break;
+                case "Credit":
+                    _stateManager.Next(new CreditsState(_game, _graphicsDevice, _content), Transition.NoTransition);
                     break;
                 //StateManager.Instance.Next(new NewGameState());
                 default:
