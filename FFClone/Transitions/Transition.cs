@@ -16,6 +16,7 @@ namespace FFClone.Transitions
             TotalFrames = totalFrames;
             Rectangle = rectangle;
         }
+        public static Transition NoTransition { get { return new NoTransition(); } }
         public abstract void Update(GameTime gameTime);
         public abstract void Draw(GameTime gameTime, SpriteBatch spriteBatch);
         public bool IsFinished()

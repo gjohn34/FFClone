@@ -27,7 +27,10 @@ namespace FFClone
         }
         public abstract void Update(GameTime gameTime);
         public abstract void Draw(GameTime gameTime, SpriteBatch spriteBatch);
-
-        public abstract void Resized();
+        public virtual void Resized() 
+        {
+            _vH = _game.Window.ClientBounds.Height;
+            _vW = _game.Window.ClientBounds.Width;
+        }
     }
 }

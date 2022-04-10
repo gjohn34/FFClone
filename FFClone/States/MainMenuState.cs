@@ -63,7 +63,7 @@ namespace FFClone.States
             switch (option)
             {
                 case "New":
-                    StateManager.Instance.Next(new GameState(_game, _graphicsDevice, _content), new NoTransition());
+                    StateManager.Instance.Next(new GameState(_game, _graphicsDevice, _content), Transition.NoTransition);
                     break;
                 case "Load":
                     Debug.WriteLine("Load selected");
@@ -84,8 +84,8 @@ namespace FFClone.States
 
         public override void Resized()
         {
-            int width = (int)Math.Ceiling(_game.Window.ClientBounds.Width * 0.2);
-            _menuList.Rectangle = new Rectangle(_game.Window.ClientBounds.Width - width, 0, width, _game.Window.ClientBounds.Height);
+            int width = (int)Math.Ceiling(_vW * 0.2);
+            _menuList.Rectangle = new Rectangle(_vW - width, 0, width, _vH);
             _menuList.Resized(_game.Window.ClientBounds);
         }
     }
