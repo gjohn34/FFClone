@@ -1,5 +1,6 @@
 ﻿using FFClone.Controls;
 using FFClone.Sprites;
+using FFClone.Transitions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -43,10 +44,6 @@ namespace FFClone.States
             //Primitives2D.DrawRectangle(spriteBatch, new Rectangle(0, 0, 200, 200), Color.Black);
         }
 
-        public override void Resized()
-        {
-        }
-
         public override void Update(GameTime gameTime)
         {
             KeyboardState keyboardState = Keyboard.GetState();
@@ -60,6 +57,16 @@ namespace FFClone.States
                 _stack.Peek().Update(gameTime);
                 return;
             }
+
+            #region Encounter
+            // Change to rng later
+            if (keyboardState.IsKeyDown(Keys.LeftShift))
+            {
+                StateManager.Instance.Next(new BattleState(_game, _graphicsDevice, _content), Transition.NoTransition);
+            }
+            #endregion
+
+
             bool playing = true;
             Vector2 velocity = Vector2.Zero;
             int speed = 4;
@@ -73,7 +80,7 @@ namespace FFClone.States
             }
             if (keyboardState.IsKeyDown(Keys.Up))
             {
-                if (_mapRectangle.Y == 0
+                if (_mapRectangle.Y >= 0
                     ||
                     _player.Position.Y > (_game.Window.ClientBounds.Height / 2) - (_player.Height / 2))
                 {
@@ -85,7 +92,7 @@ namespace FFClone.States
             }
             else if (keyboardState.IsKeyDown(Keys.Down))
             {
-                if (-_mapRectangle.Y == _mapRectangle.Height - _game.Window.ClientBounds.Height
+                if (-_mapRectangle.Y >= _mapRectangle.Height - _game.Window.ClientBounds.Height
                     ||
                     _player.Position.Y < (_game.Window.ClientBounds.Height / 2) - (_player.Height / 2))
                 {
