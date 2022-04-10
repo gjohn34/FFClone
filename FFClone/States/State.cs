@@ -14,6 +14,7 @@ namespace FFClone
         protected int _vH;
         protected int _vW;
         protected SpriteFont _font;
+        protected StateManager _stateManager;
         #endregion
         public State(Game1 game, GraphicsDevice graphicsDevice, ContentManager content)
         {
@@ -23,6 +24,7 @@ namespace FFClone
             _vH = game.Window.ClientBounds.Height;
             _vW = game.Window.ClientBounds.Width;
             _font = content.Load<SpriteFont>("Font/font");
+            _stateManager = StateManager.Instance;
 
         }
         public abstract void Update(GameTime gameTime);
