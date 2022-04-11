@@ -84,7 +84,7 @@ namespace FFClone.States
         {
             int width = (int)Math.Ceiling(_vW * 0.2);
             _menuList.Rectangle = new Rectangle(_vW - width, 0, width, _vH);
-            _menuList.Resized(_game.Window.ClientBounds);
+            _menuList.Resized();
         }
     }
 }

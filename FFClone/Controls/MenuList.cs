@@ -78,7 +78,7 @@ namespace FFClone.States
 
             //_selector.Draw(gameTime, spriteBatch);
         }
-        public void Resized(Rectangle clientBounds)
+        public void Resized()
         {
             foreach (MenuItem menuItem in MenuItems)
             {
@@ -94,7 +94,7 @@ namespace FFClone.States
             int spaceBetween = Rectangle.Height / length;
             int cellHeight = (int)Math.Ceiling((0.75 * spaceBetween));
 
-            int initialYPos = index * spaceBetween;
+            int initialYPos = index * spaceBetween + Rectangle.Y;
             double cellPositionPercentage = (double)index / (double)(length - 1);
             int pushDown = (int)(cellPositionPercentage * cellHeight);
             int pushDown2 = (int)(cellPositionPercentage * spaceBetween);
