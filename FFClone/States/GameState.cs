@@ -18,6 +18,8 @@ namespace FFClone.States
         private Texture2D _background;
         private Rectangle _mapRectangle;
         private PlayerSprite _player;
+        private KeyboardState _previousKeyboardState;
+
         public GameState(Game1 game, GraphicsDevice graphicsDevice, ContentManager content) : base(game, graphicsDevice, content)
         {
             _background = content.Load<Texture2D>("Sprites/background");
@@ -26,6 +28,7 @@ namespace FFClone.States
             int x = (_game.Window.ClientBounds.Width / 2) - (pSprite.Width / 2);
             int y = (_game.Window.ClientBounds.Height / 2) - (pSprite.Height / 2);
             _player = new PlayerSprite(pSprite, 4, 4) { Position = new Vector2(x, y) };
+            _previousKeyboardState = Keyboard.GetState();
             //{ Rectangle = new Rectangle(100, 100, 50, 50) };
         }
 
@@ -72,10 +75,15 @@ namespace FFClone.States
             int speed = 4;
             Facing facing = _player.Facing;
             bool charMove = false;
-            if (keyboardState.IsKeyDown(Keys.Enter))
+            if (keyboardState.IsKeyUp(Keys.Enter) && _previousKeyboardState.IsKeyDown(Keys.Enter))
             {
                 int width = (int)Math.Ceiling(_vW* 0.2);
-                _stack.Push(new MenuList(new List<string> { "Party", "Items", "Config"}, new Rectangle(_vW - width, 0, width, _vH), _font));
+                MenuList menuList = new MenuList(new List<string> { "Party", "Items", "Config" }, new Rectangle(_vW - width, 0, width, _vH), _font);
+                foreach (MenuItem item in menuList.MenuItems)
+                {
+                    item.Touch += HandleHandlers(item.Text);
+                }
+                _stack.Push(menuList);
                 // open up menu
             }
             if (keyboardState.IsKeyDown(Keys.Up))
@@ -145,10 +153,31 @@ namespace FFClone.States
                 _mapRectangle = new Rectangle(_mapRectangle.X - (int)velocity.X, _mapRectangle.Y - (int)velocity.Y, _mapRectangle.Width, _mapRectangle.Height);
             }
 
+            _previousKeyboardState = keyboardState;
+
+
             // Stop the player when not pressing any key
             _player.Facing = facing;
             _player.Playing = playing;
             _player.Update(gameTime);
         }
+        public EventHandler HandleHandlers(string option)
+        {
+            return option switch
+            {
+                "Party" => (object a, EventArgs e) => {
+                    // TODO Decide if pop or not.
+                    _stack.Pop();
+                    _stateManager.Next(new PartyMenuState(_game, _graphicsDevice, _content, this), Transition.NoTransition);
+                    },
+                "Items" => (object a, EventArgs e) => _stateManager.Next(new ItemMenuState(_game, _graphicsDevice, _content), Transition.NoTransition),
+                "Config" => (a, e) => { },
+                //StateManager.Instance.Next(new NewGameState());
+                _ => (a, e) => { }
+
+                ,
+            };
+        }
     }
+
 }

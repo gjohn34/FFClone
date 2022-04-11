@@ -49,7 +49,7 @@ namespace FFClone.States
             _menuList = new MenuList(options, new Rectangle(_game.Window.ClientBounds.Width - width, 0, width, _game.Window.ClientBounds.Height), _font);
             foreach (MenuItem item in _menuList.MenuItems)
             {
-                item.Touch += (a, b) => ChangeState(a, b, item.Text); 
+                item.Touch += HandleHandlers(item.Text); 
             }
         }
 
@@ -58,26 +58,21 @@ namespace FFClone.States
             _menuList.Draw(gameTime, spriteBatch);
         }
 
-        public void ChangeState(object sender, EventArgs e, string option)
+        public EventHandler HandleHandlers(string option)
         {
-            switch (option)
+            return option switch
             {
-                case "New":
-                    _stateManager.Next(new GameState(_game, _graphicsDevice, _content), Transition.NoTransition);
-                    break;
-                case "Load":
-                    Debug.WriteLine("Load selected");
-                    break;
-                case "Help":
-                    Debug.WriteLine("Help selected");
-                    break;
-                case "Credit":
-                    _stateManager.Next(new CreditsState(_game, _graphicsDevice, _content), Transition.NoTransition);
-                    break;
+                "New" => (object a, EventArgs e) => _stateManager.Next(new GameState(_game, _graphicsDevice, _content), Transition.NoTransition),
+                "Load" => (a, e) => { }
+                ,
+                "Help" => (a, e) => { }
+                ,
+                "Credit" => (a, e) => { }
+                ,
                 //StateManager.Instance.Next(new NewGameState());
-                default:
-                    break;
-            }
+                _ => (a, e) => { }
+                ,
+            };
         }
 
         public override void Update(GameTime gameTime)
