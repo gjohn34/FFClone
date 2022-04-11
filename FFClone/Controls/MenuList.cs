@@ -48,6 +48,7 @@ namespace FFClone.States
         {
             if (Pressed)
             {
+                
                 Touch?.Invoke(this, new EventArgs());
                 Pressed = false;
             }
@@ -104,19 +105,21 @@ namespace FFClone.States
         {
             KeyboardState state = Keyboard.GetState();
             bool changed = false;
-            if (state.IsKeyDown(Keys.Up) & _previousState.IsKeyUp(Keys.Up))
+            if (state.IsKeyDown(Keys.Up) && _previousState.IsKeyUp(Keys.Up))
             {
                 MenuItems[Selected].Selected = false;
                 Selected -= 1;
                 changed = true;
             }
-            else if (state.IsKeyDown(Keys.Down) & _previousState.IsKeyUp(Keys.Down))
+            else if (state.IsKeyDown(Keys.Down) && _previousState.IsKeyUp(Keys.Down))
             {
                 MenuItems[Selected].Selected = false;
                 Selected += 1;
                 changed = true;
-            } 
-            else if (state.IsKeyDown(Keys.Enter) & _previousState.IsKeyUp(Keys.Enter))
+            }
+            else if (state.IsKeyUp(Keys.Enter) && _previousState.IsKeyDown(Keys.Enter))
+
+            //else if (state.IsKeyDown(Keys.Enter) && !_previousState.IsKeyUp(Keys.Enter))
             {
                 MenuItems[Selected].Pressed = true;
             }

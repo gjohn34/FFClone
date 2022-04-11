@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 
 namespace FFClone
@@ -15,6 +16,7 @@ namespace FFClone
         protected int _vW;
         protected SpriteFont _font;
         protected StateManager _stateManager;
+        protected KeyboardState _previousKeyboard;
         #endregion
         public State(Game1 game, GraphicsDevice graphicsDevice, ContentManager content)
         {
@@ -25,6 +27,7 @@ namespace FFClone
             _vW = game.Window.ClientBounds.Width;
             _font = content.Load<SpriteFont>("Font/font");
             _stateManager = StateManager.Instance;
+            _previousKeyboard = Keyboard.GetState();
 
         }
         public abstract void Update(GameTime gameTime);
