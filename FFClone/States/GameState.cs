@@ -166,7 +166,6 @@ namespace FFClone.States
             return option switch
             {
                 "Party" => (object a, EventArgs e) => {
-                    // TODO Decide if pop or not.
                     _stack.Pop();
                     _stateManager.Next(new PartyMenuState(_game, _graphicsDevice, _content, this), Transition.NoTransition);
                     },
