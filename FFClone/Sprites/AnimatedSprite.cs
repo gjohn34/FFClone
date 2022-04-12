@@ -97,9 +97,7 @@ namespace FFClone.Sprites
             Rectangle sourceRectangle = new Rectangle(_width * column, _height * row, _width, _height);
             Rectangle destinationRectangle = new Rectangle((int)_position.X, (int)_position.Y, _width, _height);
 
-            spriteBatch.Begin();
             spriteBatch.Draw(_texture, destinationRectangle, sourceRectangle, Color.White);
-            spriteBatch.End();
         }
     }
 }

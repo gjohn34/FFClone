@@ -17,9 +17,7 @@ namespace FFClone.Transitions
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.Begin();
             Primitives2D.FillRectangle(spriteBatch, Rectangle, _color);
-            spriteBatch.End();
         }
 
         public override void Update(GameTime gameTime)

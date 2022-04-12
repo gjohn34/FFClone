@@ -33,11 +33,9 @@ namespace FFClone.Sprites
         }
         public virtual void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Begin();
             spriteBatch.Draw(_texture,
                 _position,
                 Color.White);
-            spriteBatch.End();
         }
     }
 }
