@@ -19,7 +19,6 @@ namespace FFClone.States
 
         public event EventHandler Touch;
 
-
         public MenuItem(string text, Rectangle rectangle, SpriteFont font, Color color)
         {
             Text = text;
@@ -30,7 +29,6 @@ namespace FFClone.States
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.Begin();
             Primitives2D.DrawRectangle(spriteBatch, new Rectangle(Rectangle.X - 1, Rectangle.Y - 1, Rectangle.Width + 2, Rectangle.Height + 2), Color.Black);
             Primitives2D.FillRectangle(spriteBatch, Rectangle, Selected ? FillColor : Color.MediumVioletRed);
 
@@ -41,7 +39,6 @@ namespace FFClone.States
 
                 spriteBatch.DrawString(_font, Text, new Vector2(x, y), Color.Black);
             }
-            spriteBatch.End();
         }
 
         public void Update(GameTime gameTime)
@@ -53,6 +50,7 @@ namespace FFClone.States
                 Pressed = false;
             }
         }
+        public void Resized() { }
 
     }
 

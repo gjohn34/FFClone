@@ -43,8 +43,8 @@ namespace FFClone
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _stateManager = StateManager.Instance;
             _gameInfo = GameInfo.Instance;
-            _stateManager.Next(new MainMenuState(this, GraphicsDevice, Content), Transition.NoTransition);
-            //_stateManager.Next(new BattleState(this, GraphicsDevice, Content), Transition.NoTransition);
+            //_stateManager.Next(new MainMenuState(this, GraphicsDevice, Content), Transition.NoTransition);
+            _stateManager.Next(new BattleState(this, GraphicsDevice, Content), Transition.NoTransition);
             //_stateManager.Next(new MainMenuState(this, GraphicsDevice, Content), new FadeIn(60, new Rectangle(0, 0, Window.ClientBounds.Width, Window.ClientBounds.Height)));
 
         }

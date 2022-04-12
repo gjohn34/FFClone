@@ -1,4 +1,5 @@
 ﻿using FFClone.Models;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,7 +14,7 @@ namespace FFClone
 
         GameInfo()
         {
-            Party = new List<Hero> { new Hero("John", Job.Warrior), new Hero("Luke", Job.Mage), new Hero("Paul", Job.Thief) };
+            Party = new List<Hero> { new Hero("John", Job.Warrior, Color.Red), new Hero("Luke", Job.Mage, Color.Blue), new Hero("Paul", Job.Thief, Color.Green) };
 
         }
 

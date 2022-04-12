@@ -4,7 +4,7 @@ using MonoGame;
 
 namespace FFClone.Helpers.Shapes
 {
-    public static class RectangleHelper
+    public static class ShapeHelper
     {
         public static void DrawRectangleWithFill(this SpriteBatch spriteBatch, Rectangle rectangle, int thickness, Color outline, Color fill)
         {
@@ -23,3 +23,4 @@ namespace FFClone.Helpers.Shapes
         }
     }
 }
+

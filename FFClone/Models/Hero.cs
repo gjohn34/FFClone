@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -19,12 +20,14 @@ namespace FFClone.Models
         public int Strength { get; set; }
         public int Intelligence { get; set; }
         public int Dexterity { get; set; }
+        public Color Color { get; set; }
 
-        public Hero(string name, Job job)
+        public Hero(string name, Job job, Color color)
         {
             Name = name;
             Job = job;
             GenerateStats();
+            Color = color;
         }
 
         private void GenerateStats()

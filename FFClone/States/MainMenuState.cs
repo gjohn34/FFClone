@@ -10,33 +10,6 @@ using System.Diagnostics;
 using System.Text;
 namespace FFClone.States
 {
-    public class Triangle
-    {
-        public Vector2 Point1 { get; set; }
-        public Vector2 Point2 { get; set; }
-        public Vector2 Point3 { get; set; }
-        public Triangle(Vector2 point, Point size)
-        {
-            Point1 = point;
-            Point2 = new Vector2(point.X - size.X, point.Y - size.Y);
-            Point3 = new Vector2(point.X - size.X, point.Y + size.Y);
-        }
-        public Triangle(Vector2 p1, Vector2 p2, Vector2 p3)
-        {
-            Point1 = p1;
-            Point2 = p2;
-            Point3 = p3;
-        }
-        public void Update(GameTime gameTime)
-        {
-        }
-        public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
-        {
-            Primitives2D.DrawLine(spriteBatch, Point1, Point2, Color.Black);
-            Primitives2D.DrawLine(spriteBatch, Point1, Point3, Color.Black);
-            Primitives2D.DrawLine(spriteBatch, Point2, Point3, Color.Black);
-        }
-    }
     public class MainMenuState : State
     {
         private MenuList _menuList;
@@ -55,7 +28,9 @@ namespace FFClone.States
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
+            spriteBatch.Begin();
             _menuList.Draw(gameTime, spriteBatch);
+            spriteBatch.End();
         }
 
         public EventHandler HandleHandlers(string option)

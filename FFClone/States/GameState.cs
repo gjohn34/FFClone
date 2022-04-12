@@ -36,7 +36,6 @@ namespace FFClone.States
         {
             spriteBatch.Begin();
             spriteBatch.Draw(_background, _mapRectangle, Color.White);
-            spriteBatch.End();
 
             _player.Draw(spriteBatch);
 
@@ -44,6 +43,7 @@ namespace FFClone.States
             {
                 _stack.Peek().Draw(gameTime, spriteBatch);
             }
+            spriteBatch.End();
             //Primitives2D.DrawRectangle(spriteBatch, new Rectangle(0, 0, 200, 200), Color.Black);
         }
 
