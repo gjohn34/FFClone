@@ -14,7 +14,12 @@ namespace FFClone
 
         GameInfo()
         {
-            Party = new List<Hero> { new Hero("John", Job.Warrior, Color.Red), new Hero("Luke", Job.Mage, Color.Blue), new Hero("Paul", Job.Thief, Color.Green) };
+            Party = new List<Hero>
+            {
+                new Hero("John", Job.Warrior, Color.Red, "Sprites/ninja-idle"),
+                new Hero("Luke", Job.Mage, Color.Blue, "Sprites/ninja-idle"),
+                new Hero("Paul", Job.Thief, Color.Green, "Sprites/ninja-idle") 
+            };
 
         }
 

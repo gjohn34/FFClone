@@ -39,7 +39,6 @@ namespace FFClone.States
             Primitives2D.DrawLine(spriteBatch, Point1, Point3, Color.Black);
             Primitives2D.DrawLine(spriteBatch, Point2, Point3, Color.Black);
         }
-
         public void Update(Vector2 point, Point size)
         {
             Point1 = point;
@@ -51,15 +50,19 @@ namespace FFClone.States
     public class Prompt : IComponent
     {
         private KeyboardState _previous;
-        private List<Vector2> _vectors;
+        public List<Vector2> Vectors;
         private int _promptOn = 0;
         private Triangle _selector;
-        public Prompt(List<Vector2> vectors)
+        private Battle _battle;
+        public Rectangle Rectangle { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public Prompt(List<Vector2> vectors, Battle battle)
         {
             _previous = Keyboard.GetState();
-            _vectors = vectors;
+            Vectors = vectors;
             _selector = new Triangle(vectors[_promptOn], new Point(35, 12));
+            _battle = battle;
         }
+
         public void Update(GameTime gameTime)
         {
             KeyboardState keyboard = Keyboard.GetState();
@@ -67,13 +70,12 @@ namespace FFClone.States
 
             if (keyboard.Released(_previous, Keys.Enter))
             {
-                Debug.WriteLine("Enter Pressed");
-            }
-            else if (keyboard.Released(_previous, Keys.Down))
+                _battle.SetSelected(_promptOn);  
+            } else if (keyboard.Released(_previous, Keys.Down))
             {
                 changed = true;
                 _promptOn += 1;
-                if (_promptOn >= _vectors.Count)
+                if (_promptOn >= Vectors.Count)
                 {
                     _promptOn = 0;
                 }
@@ -84,12 +86,12 @@ namespace FFClone.States
                 _promptOn -= 1;
                 if (_promptOn < 0)
                 {
-                    _promptOn = _vectors.Count - 1;
+                    _promptOn = Vectors.Count - 1;
                 }
             }
             if (changed)
             {
-                _selector.Update(_vectors[_promptOn], new Point(35, 12));
+                _selector.Update(Vectors[_promptOn], new Point(35, 12));
             }
 
             _previous = keyboard;
@@ -98,9 +100,9 @@ namespace FFClone.States
         {
             _selector.Draw(gameTime, spriteBatch);
         }
-
         public void Resized()
         {
+            _selector = new Triangle(Vectors[_promptOn], new Point(35, 12));
             //throw new NotImplementedException();
         }
     }
@@ -109,16 +111,39 @@ namespace FFClone.States
     {
         private List<Hero> _party;
         private List<Enemy> _enemies;
+        private Battle _battle;
         private int _thickness = 10;
         private Rectangle _bottomBar;
         private Rectangle _cBar;
-        private MenuList _command;
         private Stack<IComponent> _menuStack = new Stack<IComponent>();
+        //private Battle _battle;
+        private List<AnimatedSprite> _partySprites = new List<AnimatedSprite>();
+
 
         public BattleState(Game1 game, GraphicsDevice graphicsDevice, ContentManager content) : base(game, graphicsDevice, content)
         {
             _party = GameInfo.Instance.Party;
-            _enemies = new List<Enemy> { new Enemy(Color.Purple), new Enemy(Color.Purple), new Enemy(Color.Purple) };
+
+            Dictionary<string, int> statBlock = new Dictionary<string, int>()
+            {
+                {
+                    "HP",10
+                },
+                {
+                    "MaxHP", 10
+                },
+                {
+                    "STR", 10
+                },
+                {
+                    "INT", 10
+                },
+                {
+                    "DEX", 10
+                },
+            };
+            _enemies = new List<Enemy> { new Enemy("Purple Guy", Color.Purple, statBlock), new Enemy("Purple Guy", Color.Purple, statBlock) };
+            _battle = new Battle(_party, _enemies, game, graphicsDevice, content);
             // TODO - This refactor this w/ resize
             int height = (int)(_vH * 0.3);
             int menuYPos = _vH - height + _thickness;
@@ -130,7 +155,7 @@ namespace FFClone.States
             {
                 item.Touch += HandleHandlers(item.Text);
             }
-            _menuStack.Push(commandMenu) ;
+            _menuStack.Push(commandMenu);
         }
 
         public EventHandler HandleHandlers(string option)
@@ -141,31 +166,23 @@ namespace FFClone.States
                 {
                     double yOffset = 0.1;
                     List<Vector2> vectors = new List<Vector2>();
-                    foreach (Enemy item in _enemies)
+                    foreach (Enemy enemy in _enemies)
                     {
-                        vectors.Add(new Vector2((int)(_vW * 0.20) - 25, (int)(_vH * yOffset) + 25));
-                        yOffset += 0.2;
+                        vectors.Add(enemy.BattleSprite.Position);
+                        //vectors.Add(new Vector2((int)(_vW * 0.20) - 25, (int)(_vH * yOffset) + 25));
+                        //yOffset += 0.2;
                     }
+                    _battle.EnablePrompt(vectors);
                     // hardcoded 25's to center. need to fix that
-                    _menuStack.Push(new Prompt(vectors));
-                    //    new Vector2((int)(_vW * 0.20) - 25, (int)(_vH * 0.10) + 25),
-                    //    new Point(35, 12),
-                    //);
-
-
+                    //_menuStack.Push();
                 }
                 ,
-                "Defend" => (object a, EventArgs e) => Debug.WriteLine("Defend"),
-                "Spell" => (object a, EventArgs e) => Debug.WriteLine("Spell")
-                //{ 
-                //_menuStack.Push(prompt);
-                //_stack.Pop();
-                //_stateManager.Next(new PartyMenuState(_game, _graphicsDevice, _content, this), Transition.NoTransition);
-                //}
-                ,
-                _ => (a, e) => { }
-
-                ,
+                "Defend" => (object a, EventArgs e) => 
+                {
+                    _battle.Defend();
+                },
+                "Spell" => (object a, EventArgs e) => Debug.WriteLine("Spell"),
+                _ => (a, e) => { },
             };
         }
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -178,9 +195,6 @@ namespace FFClone.States
 
             // bottom bar
             spriteBatch.DrawRectangleWithFill(_bottomBar, _thickness, Color.Black, Color.CadetBlue);
-
-
-
 
             // commands
             int commandWidth = (int)(_vW * 0.35);
@@ -202,11 +216,13 @@ namespace FFClone.States
             int xOffset = commandWidth + 1;
             double yOffset = 0.1;
 
+            _battle.Draw(gameTime, spriteBatch);
+
             foreach (Hero hero in _party)
             {
                 Vector2 v = new Vector2(xOffset, menuYPos);
                 // player sprite
-                spriteBatch.DrawRectangleWithFill(new Rectangle((int)(_vW - (_vW * 0.20)), (int)(_vH * yOffset), 50, 50), 1, Color.Black, hero.Color);
+                //spriteBatch.DrawRectangleWithFill(new Rectangle((int)(_vW - (_vW * 0.20)), (int)(_vH * yOffset), 50, 50), 1, Color.Black, hero.Color);
                 yOffset += 0.2;
                 // command box
                 spriteBatch.DrawRectangleWithFill(new Rectangle(xOffset, menuYPos, charInfoWidth, height - 2 * thickness - 1), 1, Color.Black, hero.Color);
@@ -217,22 +233,24 @@ namespace FFClone.States
                 xOffset += charInfoWidth + 1;
             }
 
-            // enemies
-            yOffset = 0.1;
-            foreach (Enemy enemy in _enemies)
-            {
-                spriteBatch.DrawRectangleWithFill(new Rectangle((int)(_vW * 0.20), (int)(_vH * yOffset), 50, 50), 1, Color.Black, enemy.Color);
-                yOffset += 0.2;
-            }
-
             spriteBatch.End();
         }
 
         public override void Update(GameTime gameTime)
         {
-            if (_menuStack.TryPeek(out _))
+            if (!_battle.BattleOver())
             {
-                _menuStack.Peek().Update(gameTime);
+                _battle.Update(gameTime);
+            }
+            if (_battle.HasPrompt)
+            {
+                _battle.Prompt.Update(gameTime);
+            } else
+            {
+                if (_menuStack.TryPeek(out _))
+                {
+                    _menuStack.Peek().Update(gameTime);
+                }
             }
         }
 
@@ -244,10 +262,13 @@ namespace FFClone.States
             int commandWidth = (int)(_vW * 0.35);
             _bottomBar = new Rectangle(_thickness, _vH - height, _vW - _thickness, height - _thickness);
             _cBar = new Rectangle(_thickness, menuYPos, commandWidth - _thickness, height - 2 * _thickness - 1);
+            IComponent[] x = _menuStack.ToArray();
+            x[0].Rectangle = _cBar;
             foreach (IComponent component in _menuStack)
             {
                 component.Resized();
             }
+            _battle.Resized();
             //_command.Rectangle = _cBar;
             //_command.Resized();
         }
