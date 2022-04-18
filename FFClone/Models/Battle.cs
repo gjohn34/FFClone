@@ -41,63 +41,24 @@ namespace FFClone.Models
             _vW = game.Window.ClientBounds.Width;
             _vH = game.Window.ClientBounds.Height;
             _game = game;
-            double yOffset = 0.1;
-
+            Current = party[0];
             party.ForEach(hero => {
                 Texture2D texture = content.Load<Texture2D>(hero.Path);
                 hero.BattleSprite = new AnimatedSprite(texture, 1, 3)
                 {
-                    Position = new Vector2((int)(_vW - (_vW * 0.20)), (int)(_vH * yOffset)),
                     Playing = true
                 };
-                yOffset += 0.2;
             });
             Party = party;
             Enemies = enemies;
-            int requiredHeight = 0;
-            int largestSpriteHeight = 0;
             enemies.ForEach(enemy =>
             {
                 Texture2D texture = content.Load<Texture2D>(enemy.Path);
                 enemy.BattleSprite = new AnimatedSprite(texture, 1, 8);
-                requiredHeight += enemy.BattleSprite.Height;
-                if (enemy.BattleSprite.Height > largestSpriteHeight)
-                {
-                    largestSpriteHeight = enemy.BattleSprite.Height;
-                }
-            });
-            int spritesPerColumn = (int)(0.7 * _vH) / (largestSpriteHeight);
-            int index = 0;
-            yOffset = 0;
-            int xOffset = 0;
-            int spritesLeft = Enemies.Count;
-            enemies.ForEach(enemy =>
-            {
-                int yMargin = 0;
-                if (spritesLeft <= (Enemies.Count % spritesPerColumn))
-                {
-                    int availableSpace = (spritesPerColumn * largestSpriteHeight) - (Enemies.Count % spritesPerColumn) * largestSpriteHeight;
-                    yMargin = (int)(0.5 * availableSpace);
-                    
-                }
-                enemy.BattleSprite.Position = new Vector2((int)(_vW * 0.3) - xOffset,(int)yOffset + yMargin);
-                enemy.BattleSprite.Playing = true;
-                index++;
-                if (index >= spritesPerColumn)
-                {
-                    xOffset += enemy.BattleSprite.Width;
-                    yOffset = 0;
-                    index = 0;
-                } else
-                {
-                    yOffset += enemy.BattleSprite.Height;
-                }
-                spritesLeft--;
             });
 
-            Current = party[0];
-            Vector2 pos = Current.BattleSprite.Position;
-            Current.BattleSprite.Position = new Vector2(pos.X - 50, pos.Y);
+            SetHeroSprites();
+            SetEnemySprite();
         }
 
         public void EnablePrompt(List<Vector2> vectors)
@@ -183,8 +144,6 @@ namespace FFClone.Models
         public void SetHeroSprites()
         {
             double yOffset = 0.1;
-            _vH = _game.Window.ClientBounds.Height;
-            _vW = _game.Window.ClientBounds.Width;
             Party.ForEach(hero => {
                 hero.BattleSprite.Position = new Vector2((int)(_vW - (_vW * 0.20)), (int)(_vH * yOffset));
                 yOffset += 0.2;
@@ -240,6 +199,8 @@ namespace FFClone.Models
         internal void Resized()
         {
 
+            _vW = _game.Window.ClientBounds.Width;
+            _vH = _game.Window.ClientBounds.Height;
             SetHeroSprites();
             SetEnemySprite();
 
