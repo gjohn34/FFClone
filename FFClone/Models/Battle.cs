@@ -66,16 +66,21 @@ namespace FFClone.Models
                     largestSpriteHeight = enemy.BattleSprite.Height;
                 }
             });
-            // center sprites dynamically, look at menu
-            //int availableSpaceForMargin = (int)(0.7 * _vH) - (spritesPerColumn * largestSpriteHeight);
-            //int margin = availableSpaceForMargin / spritesPerColumn + (int)Math.Ceiling((0.5 * largestSpriteHeight));
-            int spritesPerColumn = (int)(0.7 * _vH) / largestSpriteHeight;
+            int spritesPerColumn = (int)(0.7 * _vH) / (largestSpriteHeight);
             int index = 0;
             yOffset = 0;
             int xOffset = 0;
+            int spritesLeft = Enemies.Count;
             enemies.ForEach(enemy =>
             {
-                enemy.BattleSprite.Position = new Vector2((int)(_vW * 0.3) - xOffset,(int)yOffset + 50);
+                int yMargin = 0;
+                if (spritesLeft <= (Enemies.Count % spritesPerColumn))
+                {
+                    int availableSpace = (spritesPerColumn * largestSpriteHeight) - (Enemies.Count % spritesPerColumn) * largestSpriteHeight;
+                    yMargin = (int)(0.5 * availableSpace);
+                    
+                }
+                enemy.BattleSprite.Position = new Vector2((int)(_vW * 0.3) - xOffset,(int)yOffset + yMargin);
                 enemy.BattleSprite.Playing = true;
                 index++;
                 if (index >= spritesPerColumn)
@@ -87,6 +92,7 @@ namespace FFClone.Models
                 {
                     yOffset += enemy.BattleSprite.Height;
                 }
+                spritesLeft--;
             });
 
             Current = party[0];
@@ -174,7 +180,7 @@ namespace FFClone.Models
             NextHero();
         }
 
-        internal void Resized()
+        public void SetHeroSprites()
         {
             double yOffset = 0.1;
             _vH = _game.Window.ClientBounds.Height;
@@ -188,8 +194,11 @@ namespace FFClone.Models
 
             Vector2 pos = Current.BattleSprite.Position;
             Party[current].BattleSprite.Position = new Vector2(pos.X - 50, pos.Y);
-            
+        }
+        public void SetEnemySprite()
+        {
             int largestSpriteHeight = 0;
+
             Enemies.ForEach(enemy =>
             {
                 if (enemy.BattleSprite.Height > largestSpriteHeight)
@@ -198,13 +207,21 @@ namespace FFClone.Models
                 }
             });
 
-            int spritesPerColumn = (int)(0.7 * _vH) / largestSpriteHeight;
+            int spritesPerColumn = (int)(0.7 * _vH) / (largestSpriteHeight);
             int index = 0;
-            yOffset = 0;
+            int yOffset = 0;
             int xOffset = 0;
+            int spritesLeft = Enemies.Count;
             Enemies.ForEach(enemy =>
             {
-                enemy.BattleSprite.Position = new Vector2((int)(_vW * 0.3) - xOffset, (int)yOffset + 50);
+                int yMargin = 0;
+                if (spritesLeft <= (Enemies.Count % spritesPerColumn))
+                {
+                    int availableSpace = (spritesPerColumn * largestSpriteHeight) - (Enemies.Count % spritesPerColumn) * largestSpriteHeight;
+                    yMargin = (int)(0.5 * availableSpace);
+
+                }
+                enemy.BattleSprite.Position = new Vector2((int)(_vW * 0.3) - xOffset, (int)yOffset + yMargin);
                 enemy.BattleSprite.Playing = true;
                 index++;
                 if (index >= spritesPerColumn)
@@ -217,7 +234,14 @@ namespace FFClone.Models
                 {
                     yOffset += enemy.BattleSprite.Height;
                 }
+                spritesLeft--;
             });
+        }
+        internal void Resized()
+        {
+
+            SetHeroSprites();
+            SetEnemySprite();
 
             List<Vector2> vectors = new List<Vector2>();
 

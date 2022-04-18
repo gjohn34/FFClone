@@ -142,7 +142,11 @@ namespace FFClone.States
                     "DEX", 10
                 },
             };
-            _enemies = new List<Enemy> { new Enemy("Purple Guy", Color.Purple, statBlock), new Enemy("Purple Guy", Color.Purple, statBlock) };
+            _enemies = new List<Enemy> { 
+                new Enemy("Purple Guy", Color.Purple, statBlock), 
+                new Enemy("Purple Guy", Color.Purple, statBlock), 
+                new Enemy("Purple Guy", Color.Purple, statBlock), 
+                new Enemy("Purple Guy", Color.Purple, statBlock) };
             _battle = new Battle(_party, _enemies, game, graphicsDevice, content);
             // TODO - This refactor this w/ resize
             int height = (int)(_vH * 0.3);
