@@ -1,34 +1,38 @@
-﻿using Microsoft.Xna.Framework;
+﻿using FFClone.Sprites;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace FFClone.Models
 {
+    public enum Actions
+    {
+        Attack,
+        Defend,
+        Spell
+    }
+    internal class Action
+    {
+
+    }
     public enum Job
     {
         Warrior,
         Mage,
         Thief
     }
-    public class Hero
+    public class Hero : Character
     {
-        public string Name { get; }
         public Job Job { get; }
-        public int HP { get; set; }
-        public int MaxHP { get; set; }
-        public int Strength { get; set; }
-        public int Intelligence { get; set; }
-        public int Dexterity { get; set; }
-        public Color Color { get; set; }
 
-        public Hero(string name, Job job, Color color)
+        public Hero(string name, Job job, Color color, string path) : base(name, color, path)
         {
-            Name = name;
             Job = job;
             GenerateStats();
-            Color = color;
         }
+        public bool Defending { get; set; }
+        public AnimatedSprite BattleSprite { get; set; }
 
         private void GenerateStats()
         {

@@ -54,7 +54,7 @@ namespace FFClone.Sprites
             if (Playing)
             {
                 _tick++;
-                if (_tick >= 6)
+                if (_tick >= 9)
                 {
                     _tick = 0;
                     _currentFrame++;

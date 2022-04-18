@@ -8,7 +8,8 @@ namespace FFClone.States
     {
         public CreditsState(Game1 game, GraphicsDevice graphicsDevice, ContentManager content) : base(game, graphicsDevice, content)
         {
-            // https://opengameart.org/content/animated-character
+        // https://opengameart.org/content/animated-character
+        //https://opengameart.org/content/dorver-monster
         }
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)

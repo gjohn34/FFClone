@@ -8,9 +8,10 @@ namespace FFClone.Controls
 {
     public interface IComponent
     {
+        public Rectangle Rectangle { get; set; }
+
         public abstract void Draw(GameTime gameTime, SpriteBatch spriteBatch);
         public abstract void Update(GameTime gameTime);
-
         public abstract void Resized();
     }
 }
