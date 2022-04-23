@@ -54,13 +54,15 @@ namespace FFClone.States
         private int _promptOn = 0;
         private Triangle _selector;
         private Battle _battle;
+        private Ability _ability;
         public Rectangle Rectangle { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public Prompt(List<Vector2> vectors, Battle battle)
+        public Prompt(List<Vector2> vectors, Battle battle, Ability ability)
         {
             _previous = Keyboard.GetState();
             Vectors = vectors;
             _selector = new Triangle(vectors[_promptOn], new Point(35, 12));
             _battle = battle;
+            _ability = ability;
         }
 
         public void Update(GameTime gameTime)
@@ -70,7 +72,10 @@ namespace FFClone.States
 
             if (keyboard.Released(_previous, Keys.Enter))
             {
-                _battle.SetSelected(_promptOn);  
+                _battle.SetSelected(_promptOn, _ability);
+            } else if (keyboard.Released(_previous, Keys.Escape))
+            {
+                _battle.DisablePrompt();
             } else if (keyboard.Released(_previous, Keys.Down))
             {
                 changed = true;
@@ -116,8 +121,6 @@ namespace FFClone.States
         private Rectangle _bottomBar;
         private Rectangle _cBar;
         private Stack<IComponent> _menuStack = new Stack<IComponent>();
-        //private Battle _battle;
-        private List<AnimatedSprite> _partySprites = new List<AnimatedSprite>();
 
 
         public BattleState(Game1 game, GraphicsDevice graphicsDevice, ContentManager content) : base(game, graphicsDevice, content)
@@ -127,10 +130,10 @@ namespace FFClone.States
             Dictionary<string, int> statBlock = new Dictionary<string, int>()
             {
                 {
-                    "HP",10
+                    "HP",3
                 },
                 {
-                    "MaxHP", 10
+                    "MaxHP", 3
                 },
                 {
                     "STR", 10
@@ -143,9 +146,6 @@ namespace FFClone.States
                 },
             };
             _enemies = new List<Enemy> { 
-                new Enemy("Purple Guy", Color.Purple, statBlock), 
-                new Enemy("Purple Guy", Color.Purple, statBlock), 
-                new Enemy("Purple Guy", Color.Purple, statBlock), 
                 new Enemy("Purple Guy", Color.Purple, statBlock) };
             _battle = new Battle(_party, _enemies, game, graphicsDevice, content);
             // TODO - This refactor this w/ resize
@@ -168,15 +168,14 @@ namespace FFClone.States
             {
                 "Attack" => (object a, EventArgs e) => 
                 {
-                    double yOffset = 0.1;
                     List<Vector2> vectors = new List<Vector2>();
                     foreach (Enemy enemy in _enemies)
                     {
-                        vectors.Add(enemy.BattleSprite.Position);
+                        vectors.Add(new Vector2(enemy.BattleSprite.Position.X, enemy.BattleSprite.Position.Y + (int)(0.5 * enemy.BattleSprite.Height)));
                         //vectors.Add(new Vector2((int)(_vW * 0.20) - 25, (int)(_vH * yOffset) + 25));
                         //yOffset += 0.2;
                     }
-                    _battle.EnablePrompt(vectors);
+                    _battle.EnablePrompt(vectors, new Ability("Attack"));
                     // hardcoded 25's to center. need to fix that
                     //_menuStack.Push();
                 }
@@ -242,20 +241,50 @@ namespace FFClone.States
 
         public override void Update(GameTime gameTime)
         {
-            if (!_battle.BattleOver())
+            if (_battle.NextRound)
             {
-                _battle.Update(gameTime);
-            }
-            if (_battle.HasPrompt)
-            {
-                _battle.Prompt.Update(gameTime);
-            } else
-            {
-                if (_menuStack.TryPeek(out _))
+                foreach (Enemy enemy in _enemies)
                 {
-                    _menuStack.Peek().Update(gameTime);
+                    _battle.RoundActions.Add(new Models.Action(enemy, _party[0], new Ability("attack")));
                 }
+
+                // calculate damages;
+                // update displays
+                _battle.BattleScene = BattleScene.AnimatingStart;
             }
+            if (_battle.BattleOver)
+            {
+                if (_battle.PartyDefeated)
+                {
+
+                }
+                //_battle.Update(gameTime);
+            }
+            switch (_battle.BattleScene)
+            {
+                case BattleScene.Idle:
+                    if (_battle.HasPrompt)
+                    {
+                        _battle.Prompt.Update(gameTime);
+                    }
+                    else
+                    {
+                        if (_menuStack.TryPeek(out _))
+                        {
+                            _menuStack.Peek().Update(gameTime);
+                        }
+                    }
+                    break;
+                case BattleScene.AnimatingStart:
+                case BattleScene.Animating:
+                    break;
+                case BattleScene.AnimatingEnd:
+                    _battle.Target.HP -= _battle.Current.CalculateBattleDamage();
+                    break;
+                default:
+                    break;
+            }
+            _battle.Update(gameTime);
         }
 
         public override void Resized()

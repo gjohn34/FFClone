@@ -13,6 +13,13 @@ namespace FFClone.Sprites
         Up,
         Down
     }
+    public class BattleSprite : AnimatedSprite
+    {
+        public BattleSprite(Texture2D texture, int rows, int columns) : base(texture, rows, columns)
+        {
+        }
+        public Vector2 NextPosition { get; set; }
+    }
     public class AnimatedSprite : Sprite
     {
         private int _currentFrame = 0;

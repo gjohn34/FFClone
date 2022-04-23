@@ -6,10 +6,8 @@ using System.Diagnostics;
 
 namespace FFClone.Models
 {
-    public class Enemy : Character
+    public class Enemy : Character, IBattleable
     {
-        public AnimatedSprite BattleSprite { get; set; }
-
         public Enemy(string name, Color color, Dictionary<string, int> statBlock) : base(name, color, "Sprites/monster")
         {
             GenerateStats(statBlock);
@@ -23,5 +21,15 @@ namespace FFClone.Models
             Intelligence = statBlock["INT"];
             Dexterity = statBlock["DEX"];
         }
+        public BattleSprite BattleSprite { get; set; }
+
+        public int CalculateBattleDamage()
+        {
+            return 1;
+        }
+
+        public Vector2 HomePosition { get; set; }
+        public Vector2 MoveByTick { get; set; }
+        public Rectangle EndRectangle { get; set; }
     }
 }
