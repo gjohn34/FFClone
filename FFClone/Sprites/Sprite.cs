@@ -23,6 +23,13 @@ namespace FFClone.Sprites
                 _position = value;
             }
         }
+        public Rectangle Rectangle
+        {
+            get
+            {
+                return new Rectangle((int)_position.X, (int)_position.Y, _texture.Width, _texture.Height);
+            }
+        }
 
         public Sprite(Texture2D texture)
         {
