@@ -1,6 +1,7 @@
 ﻿using FFClone.Controls;
 using FFClone.Helpers.Keyboard;
 using FFClone.Models;
+using FFClone.States.Battle.BattleViews;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -49,10 +50,10 @@ namespace FFClone.States
         public List<Vector2> Vectors;
         private int _promptOn = 0;
         private Triangle _selector;
-        private Battle _battle;
+        private BattleMain _battle;
         private Ability _ability;
         public Rectangle Rectangle { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public Prompt(List<Vector2> vectors, Battle battle, Ability ability)
+        public Prompt(List<Vector2> vectors, BattleMain battle, Ability ability)
         {
             _previous = Keyboard.GetState();
             Vectors = vectors;
