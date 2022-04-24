@@ -1,7 +1,6 @@
-﻿using FFClone.Helpers.Keyboard;
-using FFClone.Helpers.Shapes;
+﻿using FFClone.Controls;
+using FFClone.Models;
 using FFClone.Sprites;
-using FFClone.States;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -10,8 +9,9 @@ using MonoGame;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using FFClone.States.Battle.BattleViews;
 
-namespace FFClone.Models
+namespace FFClone.States.Battle.BattleViews
 {
     public class Action
     {
@@ -37,60 +37,36 @@ namespace FFClone.Models
         Animating,
         AnimatingEnd,
     }
-    public class Battle
+    public class BattleMain : BattleView
     {
         public BattleScene BattleScene { get; set; } = BattleScene.Idle;
         // currentlyAnimating
         #region CurrentlyAnimating
         private List<BattleSprite> _battleSprites = new List<BattleSprite>();
         public BattleSprite CurrentlyAnimating { get; set; }
-        public bool EnemiesDefeated
-        {
-            get
-            {
-                return Enemies.TrueForAll(h => h.HP <= 0);
-            }
-        }
-        public bool PartyDefeated
-        {
-            get
-            {
-                return Party.TrueForAll(h => h.HP <= 0);
-            }
-        }
-        public bool BattleOver { get
-            {
-                return EnemiesDefeated || PartyDefeated;
-            }
-        }
         private int _currentlyAnimating { get; set; } = 0;
         private Action _currentAction { get; set; }
         #endregion
-        public List<Hero> Party { get; set; }
-        public List<Enemy> Enemies { get; set; }
         // TODO - Change from Hero/Enemy to Character, rename to Current/Selected
         public IBattleable Current { get; set; }
         public IBattleable Target { get; set; }
+        public List<Action> RoundActions { get; set; } = new List<Action>();
+
         public Prompt Prompt { get; private set; }
-        public bool NextRound;
         public bool HasPrompt { get { return _hasPrompt; } }
         private bool _hasPrompt = false;
-        public List<Action> RoundActions { get; set; } = new List<Action>();
-        private int _vW;
-        private int _vH;
         private int _turn = 0;
-        private Game1 _game;
-        private SpriteFont _font;
-        private Stopwatch _sw = new Stopwatch();
+        public bool NextRound;
 
-        public Battle(List<Hero> party, List<Enemy> enemies, Game1 game, GraphicsDevice graphicsDevice, ContentManager content)
+        private int _thickness = 10;
+        private BattleBars _battleBar;
+
+
+
+        public BattleMain(Game1 game, GraphicsDevice graphicsDevice, ContentManager content, BattleModel battleModel) : base(game, graphicsDevice, content, battleModel)
         {
-            _vW = game.Window.ClientBounds.Width;
-            _vH = game.Window.ClientBounds.Height;
-            _game = game;
-            _font = content.Load<SpriteFont>("Font/font");
-            Current = party[0];
-            party.ForEach(hero => {
+            Current = _party[0];
+            _party.ForEach(hero => {
                 Texture2D texture = content.Load<Texture2D>(hero.Path);
                 hero.BattleSprite = new BattleSprite(texture, 1, 3)
                 {
@@ -98,15 +74,17 @@ namespace FFClone.Models
                 };
                 _battleSprites.Add(hero.BattleSprite);
             });
-            Party = party;
-            Enemies = enemies;
-            enemies.ForEach(enemy =>
+            _enemies.ForEach(enemy =>
             {
                 Texture2D texture = content.Load<Texture2D>(enemy.Path);
                 enemy.BattleSprite = new BattleSprite(texture, 1, 8);
                 _battleSprites.Add(enemy.BattleSprite);
 
             });
+
+
+            Rectangle rectangle = new Rectangle(_thickness, _vH - (int)(_vH * 0.3), _vW - _thickness, (int)(_vH * 0.3) - _thickness);
+            _battleBar = new BattleBars(game, graphicsDevice, content, _party, _enemies, this, rectangle);
 
             SetHeroSprites();
             SetEnemySprite();
@@ -123,10 +101,10 @@ namespace FFClone.Models
             Prompt = null;
         }
 
-        public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+        public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             // heroes
-            Party.ForEach(hero => {
+            _party.ForEach(hero => {
                 hero.BattleSprite.Draw(spriteBatch);
                 if (hero.Defending)
                 {
@@ -139,7 +117,7 @@ namespace FFClone.Models
 
 
             // enemies
-            Enemies.ForEach(enemy => {
+            _enemies.ForEach(enemy => {
                 enemy.BattleSprite.Draw(spriteBatch);
             });
 
@@ -147,21 +125,23 @@ namespace FFClone.Models
             {
                 Prompt.Draw(gameTime, spriteBatch);
             }
+            _battleBar.Draw(gameTime, spriteBatch);
+
 
         }
 
         public void RoundReset()
         {
             RoundActions = new List<Action>();
-            Party.ForEach(hero => hero.Defending = false);
+            _party.ForEach(hero => hero.Defending = false);
             BattleScene = BattleScene.Idle;
-            Current = Party[0];
+            Current = _party[0];
             _currentlyAnimating = 0;
         }
 
         public void SetSelected(int promptOn, Ability ability)
         {
-            Target = Enemies[promptOn];
+            Target = _enemies[promptOn];
             RoundActions.Add(new Action(Current, Target, ability));
             _hasPrompt = false;
             NextHero();
@@ -173,23 +153,40 @@ namespace FFClone.Models
             // something funky going on here
             Current.BattleSprite.Position = new Vector2(pos.X + 50, pos.Y);
             _turn += 1;
-            if (_turn >= Party.Count)
+            if (_turn >= _party.Count)
             {
                 _turn = 0;
                 NextRound = true;
             }
-            Current = Party[_turn];
+            Current = _party[_turn];
             pos = Current.BattleSprite.Position;
             Current.BattleSprite.Position = new Vector2(pos.X - 50, pos.Y);
         }
 
-        public void Update(GameTime gameTime)
+        public override void Update(GameTime gameTime)
         {
+
+            if (NextRound)
+            {
+                foreach (Enemy enemy in _enemies)
+                {
+                    RoundActions.Add(new Action(enemy, _party[0], new Ability("attack")));
+                }
+                BattleScene = BattleScene.AnimatingStart;
+            }
             switch (BattleScene)
             {
                 case BattleScene.Idle:
-                    Party.ForEach(hero => hero.BattleSprite.Update(gameTime));
-                    Enemies.ForEach(enemy=> enemy.BattleSprite.Update(gameTime));
+                    _party.ForEach(hero => hero.BattleSprite.Update(gameTime));
+                    _enemies.ForEach(enemy=> enemy.BattleSprite.Update(gameTime));
+
+                    if (HasPrompt)
+                    {
+                        Prompt.Update(gameTime);
+                    } else
+                    {
+                        _battleBar.Update(gameTime);
+                    }
                     break;
                 case BattleScene.AnimatingStart:
                     NextRound = false;
@@ -218,24 +215,8 @@ namespace FFClone.Models
                     Current.EndRectangle = new Rectangle((int)endDestination.X, (int)endDestination.Y, 1, 1);
                     Debug.WriteLine($"{_currentAction.Executor.Name} {_currentAction.Move.Name}s {_currentAction.Target.Name} for 1 damage.");
 
-                    //CurrentlyAnimating.NextPosition = new Vector2(xDistance / 48)
-
-
-                    //foreach (Models.Action action in RoundActions)
-                    //{
-                    //    Debug.WriteLine($"{action.Executor.Name} {action.Move.Name}s {action.Target.Name} for 1 damage.");
-                    //    action.Target.HP -= action.Executor.Strength;
-                    //}
                     break;
                 case BattleScene.Animating:
-                    //_currentAction.Executor.
-                    //if (!_sw.IsRunning)
-                    //{
-                    //    _sw = new Stopwatch();
-                    //    _sw.Start();
-
-                    //}
-
                     CurrentlyAnimating.Position = new Vector2(
                         CurrentlyAnimating.Position.X - Current.MoveByTick.X,
                         CurrentlyAnimating.Position.Y - Current.MoveByTick.Y
@@ -256,6 +237,8 @@ namespace FFClone.Models
                         _currentlyAnimating += 1;
                         BattleScene = BattleScene.AnimatingStart;
                     }
+                    Target.HP -= Current.CalculateBattleDamage();
+
                     break;
                 default:
                     break;
@@ -270,21 +253,21 @@ namespace FFClone.Models
         public void SetHeroSprites()
         {
             double yOffset = 0.1;
-            Party.ForEach(hero => {
+            _party.ForEach(hero => {
                 hero.BattleSprite.Position = new Vector2((int)(_vW - (_vW * 0.20)), (int)(_vH * yOffset));
                 yOffset += 0.2;
             });
 
-            int current = Party.IndexOf((Hero)Current);
+            int current = _party.IndexOf((Hero)Current);
 
             Vector2 pos = Current.BattleSprite.Position;
-            Party[current].BattleSprite.Position = new Vector2(pos.X - 50, pos.Y);
+            _party[current].BattleSprite.Position = new Vector2(pos.X - 50, pos.Y);
         }
         public void SetEnemySprite()
         {
             int largestSpriteHeight = 0;
 
-            Enemies.ForEach(enemy =>
+            _enemies.ForEach(enemy =>
             {
                 if (enemy.BattleSprite.Height > largestSpriteHeight)
                 {
@@ -296,13 +279,13 @@ namespace FFClone.Models
             int index = 0;
             int yOffset = 0;
             int xOffset = 0;
-            int spritesLeft = Enemies.Count;
-            Enemies.ForEach(enemy =>
+            int spritesLeft = _enemies.Count;
+            _enemies.ForEach(enemy =>
             {
                 int yMargin = 0;
-                if (spritesLeft <= (Enemies.Count % spritesPerColumn))
+                if (spritesLeft <= (_enemies.Count % spritesPerColumn))
                 {
-                    int availableSpace = (spritesPerColumn * largestSpriteHeight) - (Enemies.Count % spritesPerColumn) * largestSpriteHeight;
+                    int availableSpace = (spritesPerColumn * largestSpriteHeight) - (_enemies.Count % spritesPerColumn) * largestSpriteHeight;
                     yMargin = (int)(0.5 * availableSpace);
 
                 }
@@ -322,11 +305,9 @@ namespace FFClone.Models
                 spritesLeft--;
             });
         }
-        internal void Resized()
+        public override void Resized()
         {
-
-            _vW = _game.Window.ClientBounds.Width;
-            _vH = _game.Window.ClientBounds.Height;
+            base.Resized();
             SetHeroSprites();
             SetEnemySprite();
 
@@ -334,13 +315,15 @@ namespace FFClone.Models
 
             if (_hasPrompt)
             {
-                Enemies.ForEach(enemy =>
+                _enemies.ForEach(enemy =>
                 {
                     vectors.Add(new Vector2(enemy.BattleSprite.Position.X, enemy.BattleSprite.Position.Y + (int)(0.5 * enemy.BattleSprite.Height)));
                 });
                 Prompt.Vectors = vectors;
                 Prompt.Resized();
             }
+            _battleBar.Resized();
+
         }
     }
 }

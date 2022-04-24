@@ -8,6 +8,8 @@ namespace FFClone.Models
 {
     public class Enemy : Character, IBattleable
     {
+        public string Reward = "A new car";
+        public int ExperienceGain {get; set; }
         public Enemy(string name, Color color, Dictionary<string, int> statBlock) : base(name, color, "Sprites/monster")
         {
             GenerateStats(statBlock);
@@ -20,6 +22,7 @@ namespace FFClone.Models
             Strength = statBlock["STR"];
             Intelligence = statBlock["INT"];
             Dexterity = statBlock["DEX"];
+            ExperienceGain = statBlock["EXP"];
         }
         public BattleSprite BattleSprite { get; set; }
 
