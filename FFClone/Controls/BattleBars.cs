@@ -121,14 +121,18 @@ namespace FFClone.Controls
             {
                 "Attack" => (object a, EventArgs e) =>
                 {
-                    List<Vector2> vectors = new List<Vector2>();
+                    List<IBattleable> options = new List<IBattleable>();
                     foreach (Enemy enemy in _enemies)
                     {
-                        vectors.Add(new Vector2(enemy.BattleSprite.Position.X, enemy.BattleSprite.Position.Y + (int)(0.5 * enemy.BattleSprite.Height)));
+                        if (enemy.HP > 0)
+                        {
+                            options.Add(enemy);
+                            //vectors.Add(new Vector2(enemy.BattleSprite.Position.X, enemy.BattleSprite.Position.Y + (int)(0.5 * enemy.BattleSprite.Height)));
+                        }
                         //vectors.Add(new Vector2((int)(_vW * 0.20) - 25, (int)(_vH * yOffset) + 25));
                         //yOffset += 0.2;
                     }
-                    _battle.EnablePrompt(vectors, new Ability("Attack"));
+                    _battle.EnablePrompt(options, new Ability("Attack"));
                     // hardcoded 25's to center. need to fix that
                     //_menuStack.Push();
                 }

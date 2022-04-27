@@ -18,6 +18,7 @@ namespace FFClone.States.Battle.BattleViews
         public IBattleable Executor { get; set; }
         public IBattleable Target { get; set; }
         public Ability Move { get; set; }
+        public bool Done { get; set; } = false;
         public Action(IBattleable executor, IBattleable target, Ability ability)
         {
             Executor = executor;
@@ -35,6 +36,7 @@ namespace FFClone.States.Battle.BattleViews
         Idle,
         AnimatingStart,
         Animating,
+        DamageCalculation,
         AnimatingEnd,
     }
     public class BattleMain : BattleView
@@ -44,7 +46,7 @@ namespace FFClone.States.Battle.BattleViews
         #region CurrentlyAnimating
         private List<BattleSprite> _battleSprites = new List<BattleSprite>();
         public BattleSprite CurrentlyAnimating { get; set; }
-        private int _currentlyAnimating { get; set; } = 0;
+        //private int _currentlyAnimating { get; set; } = 0;
         private Action _currentAction { get; set; }
         #endregion
         // TODO - Change from Hero/Enemy to Character, rename to Current/Selected
@@ -60,8 +62,6 @@ namespace FFClone.States.Battle.BattleViews
 
         private int _thickness = 10;
         private BattleBars _battleBar;
-
-
 
         public BattleMain(Game1 game, GraphicsDevice graphicsDevice, ContentManager content, BattleModel battleModel) : base(game, graphicsDevice, content, battleModel)
         {
@@ -89,88 +89,16 @@ namespace FFClone.States.Battle.BattleViews
             SetHeroSprites();
             SetEnemySprite();
         }
-
-        public void EnablePrompt(List<Vector2> vectors, Ability ability)
-        {
-            _hasPrompt = true;
-            Prompt = new Prompt(vectors, this, ability);
-        }
-        public void DisablePrompt()
-        {
-            _hasPrompt = false;
-            Prompt = null;
-        }
-
-        public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
-        {
-            // heroes
-            _party.ForEach(hero => {
-                hero.BattleSprite.Draw(spriteBatch);
-                if (hero.Defending)
-                {
-                    Vector2 center = new Vector2(hero.BattleSprite.Position.X + (int)(hero.BattleSprite.Width / 2), hero.BattleSprite.Position.Y + (int)(hero.BattleSprite.Height / 2));
-                    int thickness = 10;
-                    float radius = (float)((hero.BattleSprite.Width / 2) + (0.1 * hero.BattleSprite.Width));
-                    spriteBatch.DrawCircle(center, radius + thickness, 50, Color.Blue, thickness);
-                }
-            });
-
-
-            // enemies
-            _enemies.ForEach(enemy => {
-                enemy.BattleSprite.Draw(spriteBatch);
-            });
-
-            if (_hasPrompt)
-            {
-                Prompt.Draw(gameTime, spriteBatch);
-            }
-            _battleBar.Draw(gameTime, spriteBatch);
-
-
-        }
-
-        public void RoundReset()
-        {
-            RoundActions = new List<Action>();
-            _party.ForEach(hero => hero.Defending = false);
-            BattleScene = BattleScene.Idle;
-            Current = _party[0];
-            _currentlyAnimating = 0;
-        }
-
-        public void SetSelected(int promptOn, Ability ability)
-        {
-            Target = _enemies[promptOn];
-            RoundActions.Add(new Action(Current, Target, ability));
-            _hasPrompt = false;
-            NextHero();
-           
-        }
-        private void NextHero()
-        {
-            Vector2 pos = Current.BattleSprite.Position;
-            // something funky going on here
-            Current.BattleSprite.Position = new Vector2(pos.X + 50, pos.Y);
-            _turn += 1;
-            if (_turn >= _party.Count)
-            {
-                _turn = 0;
-                NextRound = true;
-            }
-            Current = _party[_turn];
-            pos = Current.BattleSprite.Position;
-            Current.BattleSprite.Position = new Vector2(pos.X - 50, pos.Y);
-        }
-
         public override void Update(GameTime gameTime)
         {
-
             if (NextRound)
             {
                 foreach (Enemy enemy in _enemies)
                 {
-                    RoundActions.Add(new Action(enemy, _party[0], new Ability("attack")));
+                    if (enemy.HP > 0)
+                    {
+                       RoundActions.Add(new Action(enemy, _party[0], new Ability("attack")));
+                    }
                 }
                 BattleScene = BattleScene.AnimatingStart;
             }
@@ -190,22 +118,27 @@ namespace FFClone.States.Battle.BattleViews
                     break;
                 case BattleScene.AnimatingStart:
                     NextRound = false;
-                    BattleScene = BattleScene.Animating;
+                    _currentAction = RoundActions.Find(x => x.Done == false);
 
-                    _currentAction = RoundActions[_currentlyAnimating];
+                    if (_currentAction == null)
+                    {
+                        BattleScene = BattleScene.Idle;
+                        break;
+                    }
+
                     Current = _currentAction.Executor;
-                    Target = _currentAction.Target; 
-                    CurrentlyAnimating = _battleSprites[_currentlyAnimating];
-                    IBattleable target = _currentAction.Target;
+                    Target = _currentAction.Target;
+                    BattleScene = BattleScene.Animating;
+                    CurrentlyAnimating = Current.BattleSprite;
                     Vector2 endDestination = new Vector2(
-                        target.BattleSprite.Position.X + target.BattleSprite.Width,
-                        target.BattleSprite.Position.Y
+                        Target.BattleSprite.Position.X + Target.BattleSprite.Width,
+                        Target.BattleSprite.Position.Y
                         );
 
                     Current.HomePosition = CurrentlyAnimating.Position;
                     CurrentlyAnimating.NextPosition = endDestination;
 
-                    int ticks = 32;
+                    int ticks = 24;
                     double xDistance = Current.HomePosition.X - endDestination.X;
                     double yDistance = Current.HomePosition.Y - endDestination.Y;
                     Current.MoveByTick = new Vector2(
@@ -213,7 +146,6 @@ namespace FFClone.States.Battle.BattleViews
                         (float)(yDistance / ticks)
                     );
                     Current.EndRectangle = new Rectangle((int)endDestination.X, (int)endDestination.Y, 1, 1);
-                    Debug.WriteLine($"{_currentAction.Executor.Name} {_currentAction.Move.Name}s {_currentAction.Target.Name} for 1 damage.");
 
                     break;
                 case BattleScene.Animating:
@@ -223,26 +155,117 @@ namespace FFClone.States.Battle.BattleViews
                     );
 
                     if (Current.EndRectangle.Intersects(CurrentlyAnimating.Rectangle)) {
-                        BattleScene = BattleScene.AnimatingEnd;
+                        BattleScene = BattleScene.DamageCalculation;
                         CurrentlyAnimating.Position = Current.HomePosition;
                     }
                     break;
+                case BattleScene.DamageCalculation:
+                    Target.HP -= Current.CalculateBattleDamage();
+                    Debug.WriteLine($"{_currentAction.Executor.Name} {_currentAction.Move.Name}s {_currentAction.Target.Name} for 1 damage.");
+
+                    _currentAction.Done = true;
+                    if (Target.HP <= 0)
+                    {
+                        Target.BattleSprite = new BattleSprite(
+                            _content.Load<Texture2D>("Sprites/grave_markers-shadow"), 1, 1)
+                        { Position = new Vector2(
+                            Target.BattleSprite.Position.X +(int)(0.5 * Target.BattleSprite.Width),
+                            Target.BattleSprite.Position.Y +(int)(0.5 * Target.BattleSprite.Height)
+                            )};
+                        //RoundActions.Find(x => x.Executor == Target).Done = true;
+                        RoundActions.ForEach(x =>
+                        {
+                            if (x.Executor == Target || x.Target == Target)
+                            {
+                                x.Done = true;
+                            }
+                        });
+                    }
+                    BattleScene = BattleScene.AnimatingEnd;
+                    break;
                 case BattleScene.AnimatingEnd:
                     CurrentlyAnimating.Position = Current.HomePosition;
-                    if (CurrentlyAnimating == _battleSprites[_battleSprites.Count - 1])
+                    if (RoundActions.TrueForAll(x => x.Done))
                     {
                         RoundReset();
                     } else
                     {
-                        _currentlyAnimating += 1;
                         BattleScene = BattleScene.AnimatingStart;
                     }
-                    Target.HP -= Current.CalculateBattleDamage();
 
                     break;
                 default:
                     break;
             }
+        }
+        public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+        {
+            // heroes
+            _party.ForEach(hero => {
+                hero.BattleSprite.Draw(spriteBatch);
+                if (hero.Defending)
+                {
+                    Vector2 center = new Vector2(hero.BattleSprite.Position.X + (int)(hero.BattleSprite.Width / 2), hero.BattleSprite.Position.Y + (int)(hero.BattleSprite.Height / 2));
+                    int thickness = 10;
+                    float radius = (float)((hero.BattleSprite.Width / 2) + (0.1 * hero.BattleSprite.Width));
+                    spriteBatch.DrawCircle(center, radius + thickness, 50, Color.Blue, thickness);
+                }
+            });
+            int yOffset = 0;
+            // enemies
+            _enemies.ForEach(enemy => {
+                enemy.BattleSprite.Draw(spriteBatch);
+                spriteBatch.DrawString(_font, $"{enemy.Name} {enemy.HP}/{enemy.MaxHP}", new Vector2(0, yOffset), Color.Black);
+                yOffset += _font.LineSpacing;
+            });
+
+            if (_hasPrompt)
+            {
+                Prompt.Draw(gameTime, spriteBatch);
+            }
+            _battleBar.Draw(gameTime, spriteBatch);
+
+
+        }
+        public void EnablePrompt(List<IBattleable> options, Ability ability)
+        {
+            _hasPrompt = true;
+            Prompt = new Prompt(options, this, ability);
+        }
+        public void DisablePrompt()
+        {
+            _hasPrompt = false;
+            Prompt = null;
+        }
+        public void RoundReset()
+        {
+            RoundActions = new List<Action>();
+            _party.ForEach(hero => hero.Defending = false);
+            BattleScene = BattleScene.Idle;
+            Current = _party.Find(x => x.HP > 0);
+        }
+        public void SetSelected(IBattleable promptOn, Ability ability)
+        {
+            Target = promptOn;
+            RoundActions.Add(new Action(Current, Target, ability));
+            _hasPrompt = false;
+            NextHero();
+           
+        }
+        private void NextHero()
+        {
+            Vector2 pos = Current.BattleSprite.Position;
+            // something funky going on here
+            Current.BattleSprite.Position = new Vector2(pos.X + 50, pos.Y);
+            _turn += 1;
+            if (_turn >= _party.Count)
+            {
+                _turn = 0;
+                NextRound = true;
+            }
+            Current = _party[_turn];
+            pos = Current.BattleSprite.Position;
+            Current.BattleSprite.Position = new Vector2(pos.X - 50, pos.Y);
         }
         public void Defend()
         {
@@ -311,15 +334,19 @@ namespace FFClone.States.Battle.BattleViews
             SetHeroSprites();
             SetEnemySprite();
 
-            List<Vector2> vectors = new List<Vector2>();
+            List<IBattleable> options = new List<IBattleable>();
 
             if (_hasPrompt)
             {
                 _enemies.ForEach(enemy =>
                 {
-                    vectors.Add(new Vector2(enemy.BattleSprite.Position.X, enemy.BattleSprite.Position.Y + (int)(0.5 * enemy.BattleSprite.Height)));
+                    if (enemy.HP > 0)
+                    {
+                        options.Add(enemy);
+                    }
+                    //vectors.Add(new Vector2(enemy.BattleSprite.Position.X, enemy.BattleSprite.Position.Y + (int)(0.5 * enemy.BattleSprite.Height)));
                 });
-                Prompt.Vectors = vectors;
+                Prompt.Options= options;
                 Prompt.Resized();
             }
             _battleBar.Resized();
