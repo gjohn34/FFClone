@@ -4,26 +4,24 @@ using FFClone.Sprites;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using MonoGame;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using FFClone.States.Battle.BattleViews;
 
 namespace FFClone.States.Battle.BattleViews
 {
-    public class Action
+    public class BattleAction
     {
         public IBattleable Executor { get; set; }
         public IBattleable Target { get; set; }
-        public Ability Move { get; set; }
+        public Action Action { get; set; }
         public bool Done { get; set; } = false;
-        public Action(IBattleable executor, IBattleable target, Ability ability)
+
+        public BattleAction(IBattleable executor, IBattleable target, Action action)
         {
             Executor = executor;
             Target = target;
-            Move = ability;
+            Action = action;
         }
         //public int CalculateNewTotals()
         //{
@@ -47,12 +45,27 @@ namespace FFClone.States.Battle.BattleViews
         private List<BattleSprite> _battleSprites = new List<BattleSprite>();
         public BattleSprite CurrentlyAnimating { get; set; }
         //private int _currentlyAnimating { get; set; } = 0;
-        private Action _currentAction { get; set; }
+        private BattleAction _currentAction { get; set; }
         #endregion
         // TODO - Change from Hero/Enemy to Character, rename to Current/Selected
         public IBattleable Current { get; set; }
         public IBattleable Target { get; set; }
-        public List<Action> RoundActions { get; set; } = new List<Action>();
+        public List<BattleAction> RoundActions { get; set; } = new List<BattleAction>();
+        public List<IBattleable> ValidEnemies
+        {
+            get
+            {
+                List<IBattleable> options = new List<IBattleable>();
+                foreach (Enemy enemy in _enemies)
+                {
+                    if (enemy.HP > 0)
+                    {
+                        options.Add(enemy);
+                    }
+                }
+                return options;
+            }
+        }
 
         public Prompt Prompt { get; private set; }
         public bool HasPrompt { get { return _hasPrompt; } }
@@ -97,7 +110,7 @@ namespace FFClone.States.Battle.BattleViews
                 {
                     if (enemy.HP > 0)
                     {
-                       RoundActions.Add(new Action(enemy, _party[0], new Ability("attack")));
+                       RoundActions.Add(new BattleAction(enemy, _party[0], new Ability("Attack")));
                     }
                 }
                 BattleScene = BattleScene.AnimatingStart;
@@ -161,7 +174,7 @@ namespace FFClone.States.Battle.BattleViews
                     break;
                 case BattleScene.DamageCalculation:
                     Target.HP -= Current.CalculateBattleDamage();
-                    Debug.WriteLine($"{_currentAction.Executor.Name} {_currentAction.Move.Name}s {_currentAction.Target.Name} for 1 damage.");
+                    Debug.WriteLine($"{_currentAction.Executor.Name} {_currentAction.Action.Name}s {_currentAction.Target.Name} for 1 damage.");
 
                     _currentAction.Done = true;
                     if (Target.HP <= 0)
@@ -227,10 +240,10 @@ namespace FFClone.States.Battle.BattleViews
 
 
         }
-        public void EnablePrompt(List<IBattleable> options, Ability ability)
+        public void EnablePrompt(List<IBattleable> options, Action action)
         {
             _hasPrompt = true;
-            Prompt = new Prompt(options, this, ability);
+            Prompt = new Prompt(options, this, action);
         }
         public void DisablePrompt()
         {
@@ -239,15 +252,15 @@ namespace FFClone.States.Battle.BattleViews
         }
         public void RoundReset()
         {
-            RoundActions = new List<Action>();
+            RoundActions = new List<BattleAction>();
             _party.ForEach(hero => hero.Defending = false);
             BattleScene = BattleScene.Idle;
             Current = _party.Find(x => x.HP > 0);
         }
-        public void SetSelected(IBattleable promptOn, Ability ability)
+        public void SetSelected(IBattleable promptOn, Action action)
         {
             Target = promptOn;
-            RoundActions.Add(new Action(Current, Target, ability));
+            RoundActions.Add(new BattleAction(Current, Target, action));
             _hasPrompt = false;
             NextHero();
            
@@ -265,12 +278,14 @@ namespace FFClone.States.Battle.BattleViews
             }
             Current = _party[_turn];
             pos = Current.BattleSprite.Position;
+
+            _battleBar.NewMenu(Current);
             Current.BattleSprite.Position = new Vector2(pos.X - 50, pos.Y);
         }
         public void Defend()
         {
             Current.Defending = true;
-            RoundActions.Add(new Action(Current, Current, new Ability("Defend")));
+            RoundActions.Add(new BattleAction(Current, Current, new Ability("Defend")));
             NextHero();
         }
         public void SetHeroSprites()
@@ -334,10 +349,11 @@ namespace FFClone.States.Battle.BattleViews
             SetHeroSprites();
             SetEnemySprite();
 
-            List<IBattleable> options = new List<IBattleable>();
 
             if (_hasPrompt)
             {
+                List<IBattleable> options = new List<IBattleable>();
+
                 _enemies.ForEach(enemy =>
                 {
                     if (enemy.HP > 0)
@@ -346,7 +362,7 @@ namespace FFClone.States.Battle.BattleViews
                     }
                     //vectors.Add(new Vector2(enemy.BattleSprite.Position.X, enemy.BattleSprite.Position.Y + (int)(0.5 * enemy.BattleSprite.Height)));
                 });
-                Prompt.Options= options;
+                Prompt.Options = options;
                 Prompt.Resized();
             }
             _battleBar.Resized();

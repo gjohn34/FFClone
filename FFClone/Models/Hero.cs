@@ -14,6 +14,9 @@ namespace FFClone.Models
         public string Name { get; }
         public int HP { get; set; }
         public int MaxHP { get; set; }
+        public List<string> Options { get; set; }
+        public List<string> Spells { get; set; }
+
         public Vector2 HomePosition { get; set; }
         public Vector2 MoveByTick { get; set; }
         public Rectangle EndRectangle { get; set; }
@@ -38,12 +41,31 @@ namespace FFClone.Models
     public class Hero : Character, IBattleable
     {
         public Job Job { get; }
+        public List<string> Spells { get; set; } = new List<string>();
+        public List<string> Options { get; set; }
 
         public Hero(string name, Job job, Color color, string path) : base(name, color, path)
         {
             Job = job;
+            SetUpOptions();
+            if (Job == Job.Mage)
+            {
+                Spells = new List<string> { "Fireball", "Ice Bolt" };
+            }
             GenerateStats();
         }
+
+        private void SetUpOptions()
+        {
+            Options = Job switch
+            {
+                Job.Warrior => new List<string> { "Attack", "Defend", "Ability" },
+                Job.Mage => new List<string> { "Attack", "Defend", "Spell", "Ability" },
+                Job.Thief => new List<string> { "Attack", "Defend", "Ability" },
+                _ => new List<string> { "Attack" },
+            };
+        }
+
         private void GenerateStats()
         {
             switch (Job)
@@ -88,7 +110,6 @@ namespace FFClone.Models
         public Vector2 HomePosition { get; set; }
         public Vector2 MoveByTick { get; set; }
         public Rectangle EndRectangle { get; set; }
-
 
         public int CalculateBattleDamage()
         {

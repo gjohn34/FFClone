@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Input;
 using MonoGame;
 using System;
 using System.Collections.Generic;
+using Action = FFClone.Models.Action;
 
 namespace FFClone.States
 {
@@ -51,17 +52,19 @@ namespace FFClone.States
         private IBattleable _promptOn;
         private Triangle _selector;
         private BattleMain _battle;
-        private Ability _ability;
+        private Action _action;
+        public EventHandler OnConfirm { get; set; }
         public Rectangle Rectangle { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public Prompt(List<IBattleable> options, BattleMain battle, Ability ability)
+        public Prompt(List<IBattleable> options, BattleMain battle, Action action)
         {
             _previous = Keyboard.GetState();
             //Vectors = vectors;
+            //Options = options.ConvertAll<Vector2>(x => new Vector2(x.BattleSprite.Position.X, x.BattleSprite.Position.Y + (int)(0.5 * x.BattleSprite.Height));
             Options = options;
             _promptOn = options[0];
-            _selector = new Triangle(_promptOn.BattleSprite.Position, new Point(35, 12));
+            _selector = new Triangle(new Vector2(_promptOn.BattleSprite.Position.X, _promptOn.BattleSprite.Position.Y + (int)(0.5 * _promptOn.BattleSprite.Height)), new Point(35, 12));
             _battle = battle;
-            _ability = ability;
+            _action = action;
         }
 
         public void Update(GameTime gameTime)
@@ -71,7 +74,8 @@ namespace FFClone.States
 
             if (keyboard.Released(_previous, Keys.Enter))
             {
-                _battle.SetSelected(_promptOn, _ability);
+                //OnConfirm.Invoke(_battle, new EventArgs());
+                _battle.SetSelected(_promptOn, _action);
             } else if (keyboard.Released(_previous, Keys.Escape))
             {
                 _battle.DisablePrompt();
@@ -100,7 +104,10 @@ namespace FFClone.States
             }
             if (changed)
             {
-                _selector.Update(_promptOn.BattleSprite.Position, new Point(35, 12));
+                _selector.Update(
+                    new Vector2(_promptOn.BattleSprite.Position.X, _promptOn.BattleSprite.Position.Y + (int)(0.5 * _promptOn.BattleSprite.Height)), 
+                    new Point(35, 12)
+                );
             }
 
             _previous = keyboard;
@@ -111,7 +118,8 @@ namespace FFClone.States
         }
         public void Resized()
         {
-            _selector = new Triangle(_promptOn.BattleSprite.Position, new Point(35, 12));
+            _selector = new Triangle(new Vector2(_promptOn.BattleSprite.Position.X, _promptOn.BattleSprite.Position.Y + (int)(0.5 * _promptOn.BattleSprite.Height)), new Point(35, 12));
+
             //throw new NotImplementedException();
         }
     }
