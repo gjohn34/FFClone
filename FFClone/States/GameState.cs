@@ -78,11 +78,12 @@ namespace FFClone.States
             if (keyboardState.IsKeyUp(Keys.Enter) && _previousKeyboardState.IsKeyDown(Keys.Enter))
             {
                 int width = (int)Math.Ceiling(_vW* 0.2);
-                MenuList menuList = new MenuList(new List<string> { "Party", "Items", "Config" }, new Rectangle(_vW - width, 0, width, _vH), _font);
-                foreach (MenuItem item in menuList.MenuItems)
-                {
-                    item.Touch += HandleHandlers(item.Text);
-                }
+                MenuList menuList = new MenuList(
+                    new List<string> { "Party", "Items", "Config" },
+                    new Rectangle(_vW - width, 0, width, _vH),
+                    _font,
+                    HandleHandlers
+                );
                 _stack.Push(menuList);
                 // open up menu
             }

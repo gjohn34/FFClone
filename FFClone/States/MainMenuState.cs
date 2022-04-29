@@ -19,11 +19,16 @@ namespace FFClone.States
             List<string> options = new List<string> { "New", "Load", "Help", "Credit" };
 
             int width = (int)Math.Ceiling(_game.Window.ClientBounds.Width * 0.2);
-            _menuList = new MenuList(options, new Rectangle(_game.Window.ClientBounds.Width - width, 0, width, _game.Window.ClientBounds.Height), _font);
-            foreach (MenuItem item in _menuList.MenuItems)
-            {
-                item.Touch += HandleHandlers(item.Text); 
-            }
+            _menuList = new MenuList(
+                options,
+                new Rectangle(_game.Window.ClientBounds.Width - width, 0, width, _game.Window.ClientBounds.Height),
+                _font,
+                HandleHandlers
+            );
+            //foreach (MenuItem item in _menuList.MenuItems)
+            //{
+            //    item.Touch += HandleHandlers(item.Text); 
+            //}
         }
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)

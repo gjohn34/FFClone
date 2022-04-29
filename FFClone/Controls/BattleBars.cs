@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Action = FFClone.Models.Action;
 
 namespace FFClone.Controls
 {
@@ -23,6 +24,7 @@ namespace FFClone.Controls
         private Stack<IComponent> _menuStack = new Stack<IComponent>();
         private Rectangle _cBar;
         private BattleMain _battle;
+
         public Rectangle Rectangle { get; set; }
         public BattleBars(Game1 game, GraphicsDevice graphicsDevice, ContentManager content, List<Hero> party, List<Enemy> enemies, BattleMain battle, Rectangle rectangle)
         {
@@ -42,11 +44,12 @@ namespace FFClone.Controls
             int commandWidth = (int)(_vW * 0.35);
 
             _cBar = new Rectangle(rectangle.X, menuYPos, commandWidth - rectangle.X, rectangle.Height - rectangle.X - 1);
-            MenuList commandMenu = new MenuList(new List<string> { "Attack", "Defend", "Spell" }, _cBar, _font);
-            foreach (MenuItem item in commandMenu.MenuItems)
-            {
-                item.Touch += HandleHandlers(item.Text);
-            }
+            MenuList commandMenu = new MenuList(
+                _battle.Current.Options,
+                _cBar, 
+                _font, 
+                HandleHandlers
+            );
             _menuStack.Push(commandMenu);
         }
 
@@ -121,31 +124,49 @@ namespace FFClone.Controls
             {
                 "Attack" => (object a, EventArgs e) =>
                 {
-                    List<IBattleable> options = new List<IBattleable>();
-                    foreach (Enemy enemy in _enemies)
-                    {
-                        if (enemy.HP > 0)
-                        {
-                            options.Add(enemy);
-                            //vectors.Add(new Vector2(enemy.BattleSprite.Position.X, enemy.BattleSprite.Position.Y + (int)(0.5 * enemy.BattleSprite.Height)));
-                        }
-                        //vectors.Add(new Vector2((int)(_vW * 0.20) - 25, (int)(_vH * yOffset) + 25));
-                        //yOffset += 0.2;
-                    }
-                    _battle.EnablePrompt(options, new Ability("Attack"));
-                    // hardcoded 25's to center. need to fix that
-                    //_menuStack.Push();
-                }
-                ,
+                    _battle.EnablePrompt(GetVectors(), new Action("Attack"));
+                },
                 "Defend" => (object a, EventArgs e) =>
                 {
                     _battle.Defend();
-                }
-                ,
-                "Spell" => (object a, EventArgs e) => Debug.WriteLine("Spell"),
-                _ => (a, e) => { }
-                ,
+                },
+                "Spell" => (object a, EventArgs e) => {
+                    _menuStack.Push(new MenuList(
+                        _battle.Current.Spells,
+                        new Rectangle(0, 0, 100, 100),
+                        _font,
+                        (string x) => { return (a, b) => { _battle.EnablePrompt(GetVectors(), new Spell(x)); }; }
+                    )
+                    );
+                },
+                _ => (a, e) => { Debug.WriteLine("Unhandled"); },
             };
+        }
+
+        internal void NewMenu(IBattleable current)
+        {
+            _menuStack.Clear();
+            MenuList menu = new MenuList(
+                _battle.Current.Options,
+                _cBar,
+                _font,
+                HandleHandlers
+            );
+            _menuStack.Push(menu);
+        }
+
+        internal List<IBattleable> GetVectors()
+        {
+
+            List<IBattleable> options = new List<IBattleable>();
+            foreach (Enemy enemy in _enemies)
+            {
+                if (enemy.HP > 0)
+                {
+                    options.Add(enemy);
+                }
+            }
+            return options;
         }
     }
 }

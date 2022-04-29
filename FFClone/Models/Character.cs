@@ -4,15 +4,6 @@ using System.Diagnostics;
 
 namespace FFClone.Models
 {
-    public class Ability
-    {
-        public string Name { get; }
-        public Ability(string name)
-        {
-            Name = name;
-        }
-
-    }
     public class Character
     {
         public Job Class { get; set; }

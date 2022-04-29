@@ -17,7 +17,7 @@ namespace FFClone.States.Battle
         }
         public BattleViewManager(BattleView next) 
         {
-            _next = next;
+            _current = next;
         }
 
         public void Update(GameTime gameTime)

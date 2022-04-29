@@ -9,6 +9,8 @@ namespace FFClone.Models
     public class Enemy : Character, IBattleable
     {
         public string Reward = "A new car";
+        public List<string> Spells { get; set; }
+
         public int ExperienceGain {get; set; }
         public Enemy(string name, Color color, Dictionary<string, int> statBlock) : base(name, color, "Sprites/monster")
         {
@@ -34,5 +36,6 @@ namespace FFClone.Models
         public Vector2 HomePosition { get; set; }
         public Vector2 MoveByTick { get; set; }
         public Rectangle EndRectangle { get; set; }
+        public List<string> Options { get; set; } = new List<string> { "Attack" };
     }
 }
