@@ -1,10 +1,12 @@
-﻿using FFClone.Helpers.Shapes;
+﻿using FFClone.Helpers.Keyboard;
+using FFClone.Helpers.Shapes;
 using FFClone.Models;
 using FFClone.States;
 using FFClone.States.Battle.BattleViews;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -22,8 +24,10 @@ namespace FFClone.Controls
         private int _vH;
         private int _vW;
         private Stack<IComponent> _menuStack = new Stack<IComponent>();
-        private Rectangle _cBar;
+        private MenuList _commandMenu;
         private BattleMain _battle;
+        private KeyboardState _previousKeyboard;
+
 
         public Rectangle Rectangle { get; set; }
         public BattleBars(Game1 game, GraphicsDevice graphicsDevice, ContentManager content, List<Hero> party, List<Enemy> enemies, BattleMain battle, Rectangle rectangle)
@@ -37,53 +41,52 @@ namespace FFClone.Controls
             _vW = game.Window.ClientBounds.Width;
             Rectangle = rectangle;
             _thickness = rectangle.X;
+            _previousKeyboard = Keyboard.GetState();
 
             // TODO - This refactor this w/ resize
             int height = (int)(_vH * 0.3);
             int menuYPos = _vH - height + _thickness;
             int commandWidth = (int)(_vW * 0.35);
 
-            _cBar = new Rectangle(rectangle.X, menuYPos, commandWidth - rectangle.X, rectangle.Height - rectangle.X - 1);
-            MenuList commandMenu = new MenuList(
+            _commandMenu = new MenuList(
                 _battle.Current.Options,
-                _cBar, 
+                new Rectangle(rectangle.X, menuYPos, commandWidth - rectangle.X, rectangle.Height - rectangle.X - 1), 
                 _font, 
                 HandleHandlers
             );
-            _menuStack.Push(commandMenu);
+            //_menuStack.Push(commandMenu);
         }
 
         public void Update(GameTime gameTime)
         {
-
+            KeyboardState ks = Keyboard.GetState();
+            if (ks.Released(_previousKeyboard, Keys.Escape))
+                _menuStack.TryPop(out _);
+            
             if (_menuStack.TryPeek(out _))
-            {
                 _menuStack.Peek().Update(gameTime);
-            }
+            else
+                _commandMenu.Update(gameTime);
+
+            _previousKeyboard = ks;
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
 
             // bottom bar
-            spriteBatch.DrawRectangleWithFill(Rectangle, _thickness, Color.Black, Color.CadetBlue);
+            spriteBatch.DrawRectangleWithFill(Rectangle, _thickness, Color.Yellow, Color.CadetBlue);
+            _commandMenu.Draw(gameTime, spriteBatch);
 
             // commands
-            int commandWidth = (int)(_vW * 0.35);
             int menuYPos = _vH - (int)(_vH * 0.3) + Rectangle.X;
-            int availableSpace = _vW - Rectangle.X - commandWidth + 3;
+            int availableSpace = _vW -  _commandMenu.Rectangle.Width - _thickness;
 
-            if (_menuStack.TryPeek(out _))
-            {
-                foreach (IComponent item in _menuStack)
-                {
-                    item.Draw(gameTime, spriteBatch);
-                }
-            }
-            int charInfoWidth = (int)(availableSpace * 0.33);
+
+            int charInfoWidth = (int)(availableSpace / 3);
 
             // offset by 1 for border pixel
-            int xOffset = commandWidth + 1;
+            int xOffset = _commandMenu.Rectangle.Width + 1;
             double yOffset = 0.1;
 
 
@@ -93,13 +96,17 @@ namespace FFClone.Controls
                 yOffset += 0.2;
                 
                 // command box
-                spriteBatch.DrawRectangleWithFill(new Rectangle(xOffset, menuYPos, charInfoWidth, Rectangle.Height - Rectangle.X - 1), 1, Color.Black, hero.Color);
+                spriteBatch.DrawRectangleWithFill(new Rectangle(xOffset, menuYPos, charInfoWidth, Rectangle.Height - Rectangle.X), 1, Color.Black, hero.Color);
                 spriteBatch.DrawString(_font, hero.Name, v, Color.White);
                 spriteBatch.DrawString(_font, $"{hero.HP} / {hero.MaxHP}", new Vector2(xOffset, menuYPos + (int)_font.LineSpacing), Color.White);
 
                 // offset by 2 for box and border pixels
                 xOffset += charInfoWidth + 1;
             }
+            IComponent[] x = _menuStack.ToArray();
+            for (int i = x.Length - 1; i >= 0; i--)
+                x[i].Draw(gameTime, spriteBatch);
+
         }
 
         public void Resized()
@@ -108,10 +115,11 @@ namespace FFClone.Controls
             _vW = _game.Window.ClientBounds.Width;
             int height = (int)(_vH * 0.3);
             int menuYPos = _vH - height + _thickness;
+            // Full Bar
             Rectangle = new Rectangle(_thickness, _vH - height, _vW - _thickness, height - _thickness);
-            _cBar = new Rectangle(Rectangle.X, menuYPos, (int)(_vW * 0.35) - Rectangle.X, height - Rectangle.X - 1);
-            IComponent[] x = _menuStack.ToArray();
-            x[0].Rectangle = _cBar;
+            // option bar
+            _commandMenu.Rectangle = new Rectangle(Rectangle.X, menuYPos, (int)(_vW * 0.35) - Rectangle.X, height - (2 * Rectangle.X) - 1);
+            _commandMenu.Resized();
             foreach (IComponent component in _menuStack)
             {
                 component.Resized();
@@ -133,7 +141,7 @@ namespace FFClone.Controls
                 "Spell" => (object a, EventArgs e) => {
                     _menuStack.Push(new MenuList(
                         _battle.Current.Spells,
-                        new Rectangle(0, 0, 100, 100),
+                        new Rectangle(0,0, _vW, _vH),
                         _font,
                         (string x) => { return (a, b) => { _battle.EnablePrompt(GetVectors(), new Spell(x)); }; }
                     )
@@ -146,13 +154,12 @@ namespace FFClone.Controls
         internal void NewMenu(IBattleable current)
         {
             _menuStack.Clear();
-            MenuList menu = new MenuList(
+            _commandMenu = new MenuList(
                 _battle.Current.Options,
-                _cBar,
+                new Rectangle(Rectangle.X, _vH - (int)(_vH * 0.3) + _thickness, (int)(_vW * 0.35) - Rectangle.X, (int)(_vH * 0.3) - (2 * Rectangle.X) - 1),
                 _font,
                 HandleHandlers
             );
-            _menuStack.Push(menu);
         }
 
         internal List<IBattleable> GetVectors()
