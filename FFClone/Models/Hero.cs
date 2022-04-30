@@ -50,7 +50,8 @@ namespace FFClone.Models
             SetUpOptions();
             if (Job == Job.Mage)
             {
-                Spells = new List<string> { "Fireball", "Ice Bolt" };
+                //Spells = new List<string> { "Fireball", "Ice Bolt", "Thunder"};
+                Spells = new List<string> { "Fireball", "Ice Bolt", "Thunder", "Aero", "Blizzard", "Darkness", "Holy Lance", "Water Whip", "Mind Blast", "Heal", "Flizz", "Biz", "Bang" };
             }
             GenerateStats();
         }

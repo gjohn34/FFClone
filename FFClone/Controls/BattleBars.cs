@@ -120,6 +120,8 @@ namespace FFClone.Controls
             // option bar
             _commandMenu.Rectangle = new Rectangle(Rectangle.X, menuYPos, (int)(_vW * 0.35) - Rectangle.X, height - (2 * Rectangle.X) - 1);
             _commandMenu.Resized();
+
+            // TODO - spell menu doesn't resize well
             foreach (IComponent component in _menuStack)
             {
                 component.Resized();
@@ -141,9 +143,11 @@ namespace FFClone.Controls
                 "Spell" => (object a, EventArgs e) => {
                     _menuStack.Push(new MenuList(
                         _battle.Current.Spells,
-                        new Rectangle(0,0, _vW, _vH),
+                        new Rectangle(0,0, _vW, _vH - _commandMenu.Rectangle.Height - (2 * _commandMenu.Rectangle.X)),
                         _font,
-                        (string x) => { return (a, b) => { _battle.EnablePrompt(GetVectors(), new Spell(x)); }; }
+                        (string x) => { return (a, b) => { _battle.EnablePrompt(GetVectors(), new Spell(x)); }; },
+                        Orientation.Horizontal,
+                        3
                     )
                     );
                 },
