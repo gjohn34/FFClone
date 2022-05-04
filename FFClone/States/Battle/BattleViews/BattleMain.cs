@@ -198,6 +198,10 @@ namespace FFClone.States.Battle.BattleViews
                     break;
                 case BattleScene.AnimatingEnd:
                     CurrentlyAnimating.Position = Current.HomePosition;
+                    if (_battleModel.BattleOver)
+                    {
+                        BattleViewManager.Instance.Next(new BattleVictory(_game, _graphicsDevice, _content, _battleModel));
+                    }
                     if (RoundActions.TrueForAll(x => x.Done))
                     {
                         RoundReset();
