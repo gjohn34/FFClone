@@ -65,7 +65,7 @@ namespace FFClone.States
             // Change to rng later
             if (keyboardState.IsKeyDown(Keys.LeftShift))
             {
-                StateManager.Instance.Next(new BattleState(_game, _graphicsDevice, _content), Transition.NoTransition);
+                StateManager.Instance.Next(new BattleState(_game, _graphicsDevice, _content, this), Transition.NoTransition);
             }
             #endregion
 

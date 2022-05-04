@@ -16,9 +16,9 @@ namespace FFClone
         {
             Party = new List<Hero>
             {
-                new Hero("John", Job.Warrior, Color.Red, "Sprites/ninja-idle"),
-                new Hero("Luke", Job.Mage, Color.Blue, "Sprites/ninja-idle"),
-                new Hero("Paul", Job.Thief, Color.Green, "Sprites/ninja-idle") 
+                new Hero("John", Job.Warrior, Color.Red, "Sprites/ninja-idle", "Sprites/Portraits/1p"),
+                new Hero("Paul", Job.Thief, Color.Green, "Sprites/ninja-idle", "Sprites/Portraits/2p"), 
+                new Hero("Luke", Job.Mage, Color.Blue, "Sprites/ninja-idle", "Sprites/Portraits/3p"),
             };
 
         }

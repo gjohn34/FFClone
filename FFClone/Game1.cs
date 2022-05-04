@@ -1,4 +1,5 @@
 ﻿using FFClone.States;
+using FFClone.States.Battle;
 using FFClone.Transitions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -43,9 +44,10 @@ namespace FFClone
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _stateManager = StateManager.Instance;
             _gameInfo = GameInfo.Instance;
+            var x = BattleViewManager.Instance;
             //_stateManager.Next(new MainMenuState(this, GraphicsDevice, Content), Transition.NoTransition);
-            _stateManager.Next(new BattleState(this, GraphicsDevice, Content), Transition.NoTransition);
-            //_stateManager.Next(new MainMenuState(this, GraphicsDevice, Content), new FadeIn(60, new Rectangle(0, 0, Window.ClientBounds.Width, Window.ClientBounds.Height)));
+            //_stateManager.Next(new BattleState(this, GraphicsDevice, Content, new GameState(this, GraphicsDevice, Content)), Transition.NoTransition);
+            _stateManager.Next(new MainMenuState(this, GraphicsDevice, Content), new FadeIn(60, new Rectangle(0, 0, Window.ClientBounds.Width, Window.ClientBounds.Height)));
 
         }
 

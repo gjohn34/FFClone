@@ -16,13 +16,12 @@ namespace FFClone.States
 
         // TODO make thickness reactive
 
-        public BattleState(Game1 game, GraphicsDevice graphicsDevice, ContentManager content) : base(game, graphicsDevice, content)
+        public BattleState(Game1 game, GraphicsDevice graphicsDevice, ContentManager content, GameState gameState) : base(game, graphicsDevice, content)
         {
-
             Dictionary<string, int> statBlock = new Dictionary<string, int>()
             {
                 {
-                    "HP",2
+                    "HP",1
                 },
                 {
                     "MaxHP", 3
@@ -42,15 +41,16 @@ namespace FFClone.States
             };
 
             List<Enemy> enemies = new List<Enemy> { 
-                new Enemy("Purple Guy 1", Color.Purple, statBlock),
-                new Enemy("Purple Guy 2", Color.Purple, statBlock),
-                new Enemy("Purple Guy 3", Color.Purple, statBlock),
+                //new Enemy("Purple Guy 1", Color.Purple, statBlock),
+                //new Enemy("Purple Guy 2", Color.Purple, statBlock),
+                //new Enemy("Purple Guy 3", Color.Purple, statBlock),
                 new Enemy("Purple Guy 4", Color.Purple, statBlock)
             };
 
             _battleModel = new BattleModel(GameInfo.Instance.Party, enemies);
-
-            _battleViewManager = new BattleViewManager(new BattleMain(game, graphicsDevice, content, _battleModel));
+            _battleViewManager = BattleViewManager.Instance;
+            //_battleViewManager = new BattleViewManager(new BattleVictory(game, graphicsDevice, content, _battleModel), gameState);
+            _battleViewManager.New(new BattleMain(game, graphicsDevice, content, _battleModel), gameState);
 
         }
 
@@ -66,10 +66,10 @@ namespace FFClone.States
 
         public override void Update(GameTime gameTime)
         {
-            if (_battleModel.BattleOver)
-            {
-                _battleViewManager.Next(new BattleVictory(_game, _graphicsDevice, _content, _battleModel));
-            }
+            //if (_battleModel.BattleOver)
+            //{
+            //    _battleViewManager.Next(new BattleVictory(_game, _graphicsDevice, _content, _battleModel));
+            //}
             _battleViewManager.Update(gameTime);
         }
 

@@ -1,5 +1,6 @@
 ﻿using FFClone.Sprites;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -40,11 +41,13 @@ namespace FFClone.Models
     }
     public class Hero : Character, IBattleable
     {
+        public string Portrait { get; }
         public Job Job { get; }
         public List<string> Spells { get; set; } = new List<string>();
         public List<string> Options { get; set; }
+        public int Experience { get; set; }
 
-        public Hero(string name, Job job, Color color, string path) : base(name, color, path)
+        public Hero(string name, Job job, Color color, string path, string portraitPath) : base(name, color, path)
         {
             Job = job;
             SetUpOptions();
@@ -54,6 +57,7 @@ namespace FFClone.Models
                 Spells = new List<string> { "Fireball", "Ice Bolt", "Thunder", "Aero", "Blizzard", "Darkness", "Holy Lance", "Water Whip", "Mind Blast", "Heal", "Flizz", "Biz", "Bang" };
             }
             GenerateStats();
+            Portrait = portraitPath;
         }
 
         private void SetUpOptions()
