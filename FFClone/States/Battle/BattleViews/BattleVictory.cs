@@ -77,7 +77,7 @@ namespace FFClone.States.Battle.BattleViews
             {
                 if (_done)
                 {
-                    BattleViewManager.Instance.Done();
+                    BattleViewManager.Instance.Done(new Rectangle(0,0,_vW, _vH));
                     return;
                 }
                 _party.ForEach(hero => hero.Experience += _remainingExp);

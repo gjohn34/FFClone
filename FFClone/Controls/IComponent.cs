@@ -12,7 +12,6 @@ namespace FFClone.Controls
     public interface IComponent
     {
         public Rectangle Rectangle { get; set; }
-
         public abstract void Draw(GameTime gameTime, SpriteBatch spriteBatch);
         public abstract void Update(GameTime gameTime);
         public abstract void Resized();
@@ -21,8 +20,6 @@ namespace FFClone.Controls
     public class TestComponent : IComponent
     {
         private KeyboardState _previous;
-
-
         public Rectangle Rectangle { get; set; }
         public EventHandler OnSubmit { get; set; }
         public TestComponent(Rectangle rectangle, EventHandler onSubmit)
