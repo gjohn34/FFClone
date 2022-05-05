@@ -19,6 +19,8 @@ namespace FFClone.States
         private Rectangle _mapRectangle;
         private PlayerSprite _player;
         private KeyboardState _previousKeyboardState;
+        private double _encounterTicks = 0;
+        private Random _rand = new Random();
 
         public GameState(Game1 game, GraphicsDevice graphicsDevice, ContentManager content) : base(game, graphicsDevice, content)
         {
@@ -52,7 +54,6 @@ namespace FFClone.States
             KeyboardState keyboardState = Keyboard.GetState();
             if (_stack.Count > 0)
             {
-
                 if (keyboardState.IsKeyDown(Keys.Escape)){
                     _stack.Pop();
                     return;
@@ -61,13 +62,7 @@ namespace FFClone.States
                 return;
             }
 
-            #region Encounter
-            // Change to rng later
-            if (keyboardState.IsKeyDown(Keys.LeftShift))
-            {
-                StateManager.Instance.Next(new BattleState(_game, _graphicsDevice, _content, this), Transition.NoTransition);
-            }
-            #endregion
+
 
 
             bool playing = true;
@@ -75,7 +70,8 @@ namespace FFClone.States
             int speed = 4;
             Facing facing = _player.Facing;
             bool charMove = false;
-            if (keyboardState.IsKeyUp(Keys.Enter) && _previousKeyboardState.IsKeyDown(Keys.Enter))
+            bool generateEnc = false;
+            if (keyboardState.IsKeyDown(Keys.Enter) && _previousKeyboardState.IsKeyUp(Keys.Enter))
             {
                 int width = (int)Math.Ceiling(_vW* 0.2);
                 MenuList menuList = new MenuList(
@@ -89,6 +85,7 @@ namespace FFClone.States
             }
             if (keyboardState.IsKeyDown(Keys.Up))
             {
+                generateEnc = true;
                 if (_mapRectangle.Y >= 0
                     ||
                     _player.Position.Y > (_game.Window.ClientBounds.Height / 2) - (_player.Height / 2))
@@ -101,6 +98,8 @@ namespace FFClone.States
             }
             else if (keyboardState.IsKeyDown(Keys.Down))
             {
+                generateEnc = true;
+
                 if (-_mapRectangle.Y >= _mapRectangle.Height - _game.Window.ClientBounds.Height
                     ||
                     _player.Position.Y < (_game.Window.ClientBounds.Height / 2) - (_player.Height / 2))
@@ -113,6 +112,8 @@ namespace FFClone.States
             }
             else if (keyboardState.IsKeyDown(Keys.Left))
             {
+                generateEnc = true;
+
                 if (_mapRectangle.X == 0
                     ||
                     _player.Position.X > (_game.Window.ClientBounds.Width / 2) - (_player.Width/ 2))
@@ -126,6 +127,8 @@ namespace FFClone.States
             }
             else if (keyboardState.IsKeyDown(Keys.Right))
             {
+                generateEnc = true;
+
                 if (-_mapRectangle.X == _mapRectangle.Width - _game.Window.ClientBounds.Width
                     ||
                     _player.Position.X < (_game.Window.ClientBounds.Width / 2) - (_player.Width/ 2))
@@ -144,19 +147,32 @@ namespace FFClone.States
             // Update position
             if (charMove)
             {
+
                 Rectangle newPos = new Rectangle((int)(_player.Position.X + velocity.X + _player.Width), (int)(_player.Position.Y + velocity.Y + _player.Height), -_player.Width, -_player.Height);
                 if (_mapRectangle.Intersects(newPos))
                 {
                     _player.Position += velocity;
                 }
-            } else
+            }
+            else
             {
                 _mapRectangle = new Rectangle(_mapRectangle.X - (int)velocity.X, _mapRectangle.Y - (int)velocity.Y, _mapRectangle.Width, _mapRectangle.Height);
             }
+            if (generateEnc)
+            {
+                _encounterTicks += 0.02;
+
+                double foo = _rand.NextDouble() + _encounterTicks;
+                if (foo > speed)
+                {
+                    _encounterTicks = 0;
+                    StateManager.Instance.Next(new BattleState(_game, _graphicsDevice, _content, this), Transition.NoTransition);
+
+                }
+
+            }
 
             _previousKeyboardState = keyboardState;
-
-
             // Stop the player when not pressing any key
             _player.Facing = facing;
             _player.Playing = playing;
