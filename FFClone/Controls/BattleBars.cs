@@ -145,9 +145,14 @@ namespace FFClone.Controls
                         _battle.Current.Spells,
                         new Rectangle(0,0, _vW, _vH - _commandMenu.Rectangle.Height - (2 * _commandMenu.Rectangle.X)),
                         _font,
-                        (string x) => { return (a, b) => { _battle.EnablePrompt(GetVectors(), new Spell(x)); }; },
+                        (string x) => { return (a, b) => {
+                            _menuStack.Pop();
+                            _battle.EnablePrompt(GetVectors(), new Spell(x)); 
+                            }; 
+                        },
                         Orientation.Horizontal,
-                        3
+                        3,
+                        0.5f
                     )
                     );
                 },

@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Input;
 using MonoGame;
 using System;
 using System.Collections.Generic;
-namespace FFClone.States
+namespace FFClone.Controls
 {
     public class MenuItem : IComponent
     {
@@ -73,13 +73,15 @@ namespace FFClone.States
         private int _minCellWidth;
         private int _minCellHeight;
         private int _rows;
+        private float _opacity = 1f;
 
         public List<MenuItem> MenuItems { get; set; } = new List<MenuItem>();
         private int Selected { get; set; } = 0;
-        public MenuList(List<string> menuItems, Rectangle rectangle, SpriteFont spriteFont, Func<string, EventHandler> onSubmit, Orientation orientation = Orientation.Vertical, int columns = 1)
+        public MenuList(List<string> menuItems, Rectangle rectangle, SpriteFont spriteFont, Func<string, EventHandler> onSubmit, Orientation orientation = Orientation.Vertical, int columns = 1, float opacity = 0f)
         {
             _orientation = orientation;
             _columns = columns;
+            _opacity = opacity;
             Rectangle = rectangle;
             _minCellWidth = 0;
             _minCellHeight = 0;
@@ -106,7 +108,7 @@ namespace FFClone.States
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.DrawRectangleWithFill(Rectangle, 0, Color.Black, _orientation == Orientation.Vertical ? Color.White : Color.Black);
+            spriteBatch.DrawRectangleWithFill(Rectangle, 0, Color.Black, _orientation == Orientation.Vertical ? Color.White : Color.Black * _opacity);
             foreach (MenuItem menuItem in MenuItems)
                 menuItem.Draw(gameTime, spriteBatch);
 
