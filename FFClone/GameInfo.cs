@@ -11,16 +11,13 @@ namespace FFClone
         private static GameInfo instance = null;
         private static readonly object padlock = new object();
         public readonly List<Hero> Party;
+        internal SaveGame ToSave => new SaveGame { Party = Party };
+
 
         GameInfo()
         {
-            Party = new List<Hero>
-            {
-                new Hero("John", Job.Warrior, Color.Red, "Sprites/ninja-idle", "Sprites/Portraits/1p"),
-                new Hero("Paul", Job.Thief, Color.Green, "Sprites/ninja-idle", "Sprites/Portraits/2p"), 
-                new Hero("Luke", Job.Mage, Color.Blue, "Sprites/ninja-idle", "Sprites/Portraits/3p"),
-            };
-
+            SaveGame sg = SaveFile.Load();
+            Party = sg.Party;
         }
 
         public static GameInfo Instance
@@ -44,6 +41,7 @@ namespace FFClone
             Party[0] = Party[2];
             Party[2] = temp;
         }
+
     }
 
 }

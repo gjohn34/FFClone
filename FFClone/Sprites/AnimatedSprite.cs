@@ -18,6 +18,7 @@ namespace FFClone.Sprites
         public BattleSprite(Texture2D texture, int rows, int columns) : base(texture, rows, columns)
         {
         }
+        public BattleSprite() { }
         public Vector2 NextPosition { get; set; }
     }
     public class AnimatedSprite : Sprite
@@ -55,6 +56,7 @@ namespace FFClone.Sprites
             _width = _texture.Width / Columns;
             _height = _texture.Height / Rows;
         }
+        public AnimatedSprite() { }
 
         public override void Update(GameTime gameTime)
         {

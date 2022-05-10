@@ -35,6 +35,7 @@ namespace FFClone.Sprites
         {
             _texture = texture;
         }
+        public Sprite() { }
         public virtual void Update(GameTime gameTime) 
         {
         }

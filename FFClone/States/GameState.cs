@@ -22,7 +22,17 @@ namespace FFClone.States
         private double _encounterTicks = 0;
         private Random _rand = new Random();
         private double _encounterChance;
-
+        internal MenuList menuList { get
+            {
+                int width = (int)Math.Ceiling(_vW * 0.2);
+                return new MenuList(
+                    new List<string> { "Party", "Items", "Config", "Save" },
+                    new Rectangle(_vW - width, 0, width, _vH),
+                    _font,
+                    HandleHandlers
+                );
+            } 
+        }
         public GameState(Game1 game, GraphicsDevice graphicsDevice, ContentManager content) : base(game, graphicsDevice, content)
         {
             _background = content.Load<Texture2D>("Sprites/background");
@@ -57,7 +67,7 @@ namespace FFClone.States
             KeyboardState keyboardState = Keyboard.GetState();
             if (_stack.Count > 0)
             {
-                if (keyboardState.IsKeyDown(Keys.Escape)){
+                if (keyboardState.IsKeyDown(Keys.Escape) && _previousKeyboard.IsKeyUp(Keys.Escape)){
                     _stack.Pop();
                     _previousKeyboard = keyboardState;
                     return;
@@ -67,9 +77,6 @@ namespace FFClone.States
                 return;
             }
 
-
-
-
             bool playing = true;
             Vector2 velocity = Vector2.Zero;
             int speed = 4;
@@ -78,13 +85,6 @@ namespace FFClone.States
             bool generateEnc = false;
             if (keyboardState.IsKeyUp(Keys.Enter) && _previousKeyboardState.IsKeyDown(Keys.Enter))
             {
-                int width = (int)Math.Ceiling(_vW* 0.2);
-                MenuList menuList = new MenuList(
-                    new List<string> { "Party", "Items", "Config" },
-                    new Rectangle(_vW - width, 0, width, _vH),
-                    _font,
-                    HandleHandlers
-                );
                 _stack.Push(menuList);
                 // open up menu
             }
@@ -190,13 +190,34 @@ namespace FFClone.States
                 "Party" => (object a, EventArgs e) => {
                     _stack.Pop();
                     _stateManager.Next(new PartyMenuState(_game, _graphicsDevice, _content, this), Transition.NoTransition);
-                    },
+                },
                 "Items" => (object a, EventArgs e) => _stateManager.Next(new ItemMenuState(_game, _graphicsDevice, _content), Transition.NoTransition),
                 "Config" => (a, e) => { },
-                //StateManager.Instance.Next(new NewGameState());
+                "Save" => (object a, EventArgs e) => {
+                    _stack.Push(new ConfirmationModal(
+                        _font,
+                        "Overwrite existing save data?",
+                        "yes",
+                        "no",
+                        _game.Window.ClientBounds,
+                        (string option) =>
+                        {
+                            return (a, b) => {
+                                if (option == "yes")
+                                {
+                                    Debug.WriteLine("Do save stuff");
+                                    SaveFile.Save();
+                                }
+                                else
+                                {
+                                    Debug.WriteLine("close modal stuff");
+                                    SaveFile.Load();
+                                }
+                            };
+                        }
+                    ));
+                },
                 _ => (a, e) => { }
-
-                ,
             };
         }
     }

@@ -1,9 +1,11 @@
 ﻿using FFClone.Sprites;
 using Microsoft.Xna.Framework;
+using System;
 using System.Diagnostics;
 
 namespace FFClone.Models
 {
+    [Serializable]
     public class Character
     {
         public Job Class { get; set; }
@@ -23,6 +25,7 @@ namespace FFClone.Models
             Color = color;
             Path = path;
         }
+        public Character() { }
 
     }
 }

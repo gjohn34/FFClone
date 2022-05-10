@@ -39,6 +39,7 @@ namespace FFClone.Models
         Mage,
         Thief
     }
+    [Serializable]
     public class Hero : Character, IBattleable
     {
         public string Portrait { get; }
@@ -60,6 +61,7 @@ namespace FFClone.Models
             GenerateStats();
             Portrait = portraitPath;
         }
+        public Hero() { }
 
         private void SetUpOptions()
         {
