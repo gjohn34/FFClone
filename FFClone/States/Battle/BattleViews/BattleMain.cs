@@ -173,9 +173,15 @@ namespace FFClone.States.Battle.BattleViews
                     }
                     break;
                 case BattleScene.DamageCalculation:
-                    Target.HP -= Current.CalculateBattleDamage();
-                    Debug.WriteLine($"{_currentAction.Executor.Name} {_currentAction.Action.Name}s {_currentAction.Target.Name} for 1 damage.");
-
+                    switch (_currentAction.Action.Name)
+                    {
+                        case "Defend":
+                            break;
+                        default:
+                            Target.HP -= Current.CalculateBattleDamage();
+                            Debug.WriteLine($"{_currentAction.Executor.Name} {_currentAction.Action.Name}s {_currentAction.Target.Name} for 1 damage.");
+                            break;
+                    }
                     _currentAction.Done = true;
                     if (Target.HP <= 0)
                     {
