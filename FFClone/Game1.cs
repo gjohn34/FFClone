@@ -47,7 +47,8 @@ namespace FFClone
             var x = BattleViewManager.Instance;
             //_stateManager.Next(new MainMenuState(this, GraphicsDevice, Content), Transition.NoTransition);
             //_stateManager.Next(new BattleState(this, GraphicsDevice, Content, new GameState(this, GraphicsDevice, Content)), Transition.NoTransition);
-            _stateManager.Next(new MainMenuState(this, GraphicsDevice, Content), new FadeIn(60, new Rectangle(0, 0, Window.ClientBounds.Width, Window.ClientBounds.Height)));
+            //_stateManager.Next(new MainMenuState(this, GraphicsDevice, Content), new FadeIn(60, new Rectangle(0, 0, Window.ClientBounds.Width, Window.ClientBounds.Height)));
+            _stateManager.Next(new GameState(this, GraphicsDevice, Content), new NoTransition());
 
         }
 
