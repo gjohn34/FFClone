@@ -21,6 +21,7 @@ namespace FFClone.States
         private KeyboardState _previousKeyboardState;
         private double _encounterTicks = 0;
         private Random _rand = new Random();
+        private double _encounterChance;
 
         public GameState(Game1 game, GraphicsDevice graphicsDevice, ContentManager content) : base(game, graphicsDevice, content)
         {
@@ -31,6 +32,7 @@ namespace FFClone.States
             int y = (_game.Window.ClientBounds.Height / 2) - (pSprite.Height / 2);
             _player = new PlayerSprite(pSprite, 4, 4) { Position = new Vector2(x, y) };
             _previousKeyboardState = Keyboard.GetState();
+            _stateManager.SetMain(this);
             //{ Rectangle = new Rectangle(100, 100, 50, 50) };
         }
 
@@ -40,11 +42,12 @@ namespace FFClone.States
             spriteBatch.Draw(_background, _mapRectangle, Color.White);
 
             _player.Draw(spriteBatch);
-
             if (_stack.Count > 0)
             {
                 _stack.Peek().Draw(gameTime, spriteBatch);
             }
+            spriteBatch.DrawString(_font, _encounterChance.ToString(), Vector2.Zero, Color.White);
+
             spriteBatch.End();
             //Primitives2D.DrawRectangle(spriteBatch, new Rectangle(0, 0, 200, 200), Color.Black);
         }
@@ -56,9 +59,11 @@ namespace FFClone.States
             {
                 if (keyboardState.IsKeyDown(Keys.Escape)){
                     _stack.Pop();
+                    _previousKeyboard = keyboardState;
                     return;
                 }
                 _stack.Peek().Update(gameTime);
+                _previousKeyboard = keyboardState;
                 return;
             }
 
@@ -71,7 +76,7 @@ namespace FFClone.States
             Facing facing = _player.Facing;
             bool charMove = false;
             bool generateEnc = false;
-            if (keyboardState.IsKeyDown(Keys.Enter) && _previousKeyboardState.IsKeyUp(Keys.Enter))
+            if (keyboardState.IsKeyUp(Keys.Enter) && _previousKeyboardState.IsKeyDown(Keys.Enter))
             {
                 int width = (int)Math.Ceiling(_vW* 0.2);
                 MenuList menuList = new MenuList(
@@ -162,8 +167,8 @@ namespace FFClone.States
             {
                 _encounterTicks += 0.02;
 
-                double foo = _rand.NextDouble() + _encounterTicks;
-                if (foo > speed)
+                _encounterChance = _rand.NextDouble() + _encounterTicks;
+                if (_encounterChance > speed)
                 {
                     _encounterTicks = 0;
                     StateManager.Instance.Next(new BattleState(_game, _graphicsDevice, _content, this), Transition.NoTransition);

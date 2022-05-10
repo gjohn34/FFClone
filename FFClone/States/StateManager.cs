@@ -18,6 +18,7 @@ namespace FFClone
         private static readonly object padlock = new object();
         private static State _current;
         private static State _next;
+        private static GameState _main;
         private Animation _animation = Animation.None;
         private Transition _transition;
         StateManager()
@@ -44,6 +45,16 @@ namespace FFClone
             _next = state;
             _transition = transition;
             _animation = Animation.Playing;
+        }
+
+        public void SetMain(GameState main)
+        {
+            _main = main;
+        }
+
+        public void Back()
+        {
+            _next = _main;
         }
 
         public void Update(GameTime gameTime)

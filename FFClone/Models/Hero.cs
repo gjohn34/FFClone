@@ -46,6 +46,7 @@ namespace FFClone.Models
         public List<string> Spells { get; set; } = new List<string>();
         public List<string> Options { get; set; }
         public int Experience { get; set; }
+        public int ToNextLevel { get; set; } = 100;
 
         public Hero(string name, Job job, Color color, string path, string portraitPath) : base(name, color, path)
         {
