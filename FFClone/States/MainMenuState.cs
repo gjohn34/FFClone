@@ -1,4 +1,5 @@
 ﻿using FFClone.Controls;
+using FFClone.Models;
 using FFClone.Transitions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -42,8 +43,14 @@ namespace FFClone.States
         {
             return option switch
             {
-                "New" => (object a, EventArgs e) => _stateManager.Next(new GameState(_game, _graphicsDevice, _content), Transition.NoTransition),
-                "Load" => (a, e) => { }
+                "New" => (object a, EventArgs e) => {
+                    SaveFile.New();
+                    _stateManager.Next(new GameState(_game, _graphicsDevice, _content), Transition.NoTransition);
+                    },
+                "Load" => (a, e) => {
+                    SaveFile.Load();
+                    _stateManager.Next(new GameState(_game, _graphicsDevice, _content), Transition.NoTransition);
+                }
                 ,
                 "Help" => (a, e) => { }
                 ,

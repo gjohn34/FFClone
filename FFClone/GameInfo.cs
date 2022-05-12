@@ -10,14 +10,13 @@ namespace FFClone
     {
         private static GameInfo instance = null;
         private static readonly object padlock = new object();
-        public readonly List<Hero> Party;
-        internal SaveGame ToSave => new SaveGame { Party = Party };
+        public List<Hero> Party { get; private set; }
+        public EncounterInfo EncounterInfo { get; private set; } = new EncounterInfo();
+        internal SaveGame ToSave => new SaveGame { Party = Party, EncounterInfo = EncounterInfo };
 
 
         GameInfo()
         {
-            SaveGame sg = SaveFile.Load();
-            Party = sg.Party;
         }
 
         public static GameInfo Instance
@@ -34,14 +33,11 @@ namespace FFClone
                 }
             }
         }
-
-        internal void Shuffle()
+        public void Initialize(SaveGame saveData)
         {
-            var temp = Party[0];
-            Party[0] = Party[2];
-            Party[2] = temp;
+            Party = saveData.Party;
+            EncounterInfo = saveData.EncounterInfo;
         }
-
     }
 
 }

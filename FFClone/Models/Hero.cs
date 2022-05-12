@@ -42,13 +42,26 @@ namespace FFClone.Models
     [Serializable]
     public class Hero : Character, IBattleable
     {
-        public string Portrait { get; }
+        public string Portrait { get; set; }
         public Job Job { get; }
         public List<string> Spells { get; set; } = new List<string>();
         public List<string> Options { get; set; }
         public int Experience { get; set; }
-        public int ToNextLevel { get; set; } = 100;
-
+        public int ToNextLevel { get; set; } = 9;
+        internal Dictionary<string, string> OldStats
+        {
+            get
+            {
+                return new Dictionary<string, string>
+                {
+                    { "Level", Level.ToString() },
+                    { "STR", Strength.ToString() },
+                    { "INT", Intelligence.ToString() },
+                    { "DEX", Dexterity.ToString() },
+                    { "HP", MaxHP.ToString() }
+                };
+            }
+        }
         public Hero(string name, Job job, Color color, string path, string portraitPath) : base(name, color, path)
         {
             Job = job;
@@ -61,7 +74,7 @@ namespace FFClone.Models
             GenerateStats();
             Portrait = portraitPath;
         }
-        public Hero() { }
+        private Hero() { }
 
         private void SetUpOptions()
         {
@@ -74,6 +87,29 @@ namespace FFClone.Models
             };
         }
 
+
+        internal bool IncreaseExperience(int experience)
+        {
+            Experience += experience;
+            if (Experience >= ToNextLevel)
+            {
+                LevelUp();
+                Experience -= ToNextLevel;
+                ToNextLevel = 9;
+                return true;
+            }
+            return false;
+        }
+
+        internal void LevelUp()
+        {
+            Level += 1;
+            Strength += 1;
+            Intelligence += 1;
+            Dexterity += 1;
+            HP += 5;
+            MaxHP += 5;
+        }
         private void GenerateStats()
         {
             switch (Job)
@@ -123,6 +159,7 @@ namespace FFClone.Models
         {
             return 1;
         }
+
     }
 
 }

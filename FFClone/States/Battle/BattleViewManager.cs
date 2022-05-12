@@ -36,7 +36,8 @@ namespace FFClone.States.Battle
 
         public void Done(Rectangle rectangle)
         {
-            StateManager.Instance.Next(_previous, new FadeIn(48, rectangle));
+            StateManager.Instance.Next(_previous, new NoTransition()) ;
+            //StateManager.Instance.Next(_previous, new FadeIn(48, rectangle));
             _current = null;
             _next = null;
         }
