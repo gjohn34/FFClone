@@ -27,27 +27,16 @@ namespace FFClone.States
 
         }
 
-        internal void ProgressBar(SpriteBatch spriteBatch, string label, int starting, int ending, Color leftFill, Color rightFill, Rectangle rectangle)
-        {
-
-            spriteBatch.DrawString(_font, $"{label} : {starting}/{ending}", new Vector2(rectangle.X, rectangle.Y), Color.Black);
-            int barWidth = rectangle.Width;
-            int width = (int)(((double)starting / ending) * barWidth);
-            int barHeight = rectangle.Height;
-            //hp left
-            spriteBatch.DrawRectangleWithFill(new Rectangle(rectangle.X, rectangle.Y + _font.LineSpacing, width, barHeight), 0, leftFill, leftFill);
-            ////hp missing
-            spriteBatch.DrawRectangleWithFill(new Rectangle(rectangle.X + width, rectangle.Y + _font.LineSpacing, barWidth - width, barHeight), 0, rightFill, rightFill);
-            //hp bar outline
-            spriteBatch.DrawRectangle(new Rectangle(rectangle.X, rectangle.Y + _font.LineSpacing, 100, 20), Color.Black);
-        }
-
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             int x = 100;
             int y = 100;
             spriteBatch.Begin();
             int spaceBetweenY = _vH / _portraits.Count;
+            if (spaceBetweenY > (int)(0.25f * _vH))
+            {
+                spaceBetweenY = (int)(0.33f * _vH);
+            }
             int xMargin = 10;
             int cellHeight = (int)Math.Ceiling((0.75 * spaceBetweenY));
 
@@ -65,10 +54,10 @@ namespace FFClone.States
                 spriteBatch.DrawString(_font, hero.Name, new Vector2(cellHeight + xMargin, yPosition), Color.Black);
                 yPosition += _font.LineSpacing;
                 // hp
-                ProgressBar(spriteBatch, "HP", hero.HP, hero.MaxHP, Color.Green, Color.Red, new Rectangle(cellHeight + xMargin, yPosition, 100, 20));
+                spriteBatch.ProgressBar(_font, "HP", hero.HP, hero.MaxHP, Color.Green, Color.Red, new Rectangle(cellHeight + xMargin, yPosition, 100, 20));
                 yPosition += _font.LineSpacing + 20 + 5;
                 // xp
-                ProgressBar(spriteBatch, "XP", hero.Experience, hero.ToNextLevel, Color.Blue, Color.White, new Rectangle(cellHeight + xMargin, yPosition, 100, 20));
+                spriteBatch.ProgressBar(_font, "XP", hero.Experience, hero.ToNextLevel, Color.Blue, Color.White, new Rectangle(cellHeight + xMargin, yPosition, 100, 20));
 
                 // statblock
                 yPosition = initialYPos - pushDown + pushDown2;
@@ -100,12 +89,6 @@ namespace FFClone.States
             if (_previousKeyboard.IsKeyDown(Keys.Escape) && k.IsKeyUp(Keys.Escape))
             {
                 _stateManager.Next(_sender, Transition.NoTransition);
-            } else if (_previousKeyboard.IsKeyDown(Keys.S) && k.IsKeyUp(Keys.S))
-            {
-                GameInfo.Instance.Shuffle();
-            } else if (_previousKeyboard.IsKeyDown(Keys.A) && k.IsKeyUp(Keys.A))
-            {
-                Debug.WriteLine(_party);
             }
             _previousKeyboard = k;
         }

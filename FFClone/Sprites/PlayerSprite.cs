@@ -49,6 +49,10 @@ namespace FFClone.Sprites
             //// Stop the player when not pressing any key
             //_velocity = Vector2.Zero;
             base.Update(gameTime);
+            if (Playing)
+            {
+                GameInfo.Instance.EncounterInfo.Position = _position;
+            }
         }
     }
 }

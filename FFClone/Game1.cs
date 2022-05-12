@@ -12,7 +12,6 @@ namespace FFClone
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         private StateManager _stateManager;
-        private GameInfo _gameInfo;
 
         public Game1()
         {
@@ -43,12 +42,10 @@ namespace FFClone
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _stateManager = StateManager.Instance;
-            _gameInfo = GameInfo.Instance;
-            var x = BattleViewManager.Instance;
-            //_stateManager.Next(new MainMenuState(this, GraphicsDevice, Content), Transition.NoTransition);
+            _stateManager.Next(new MainMenuState(this, GraphicsDevice, Content), Transition.NoTransition);
             //_stateManager.Next(new BattleState(this, GraphicsDevice, Content, new GameState(this, GraphicsDevice, Content)), Transition.NoTransition);
             //_stateManager.Next(new MainMenuState(this, GraphicsDevice, Content), new FadeIn(60, new Rectangle(0, 0, Window.ClientBounds.Width, Window.ClientBounds.Height)));
-            _stateManager.Next(new GameState(this, GraphicsDevice, Content), new NoTransition());
+            //_stateManager.Next(new GameState(this, GraphicsDevice, Content), new NoTransition());
 
         }
 

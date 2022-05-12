@@ -1,4 +1,5 @@
 ﻿using FFClone.Controls;
+using FFClone.Models;
 using FFClone.Sprites;
 using FFClone.Transitions;
 using Microsoft.Xna.Framework;
@@ -19,9 +20,8 @@ namespace FFClone.States
         private Rectangle _mapRectangle;
         private PlayerSprite _player;
         private KeyboardState _previousKeyboardState;
-        private double _encounterTicks = 0;
+        private EncounterInfo _encounterInfo;
         private Random _rand = new Random();
-        private double _encounterChance;
         internal MenuList menuList { get
             {
                 int width = (int)Math.Ceiling(_vW * 0.2);
@@ -35,12 +35,19 @@ namespace FFClone.States
         }
         public GameState(Game1 game, GraphicsDevice graphicsDevice, ContentManager content) : base(game, graphicsDevice, content)
         {
+            _encounterInfo = GameInfo.Instance.EncounterInfo;
             _background = content.Load<Texture2D>("Sprites/background");
             _mapRectangle = new Rectangle(0, 0, _background.Width, _background.Height);
             Texture2D pSprite = content.Load<Texture2D>("Sprites/guy");
-            int x = (_game.Window.ClientBounds.Width / 2) - (pSprite.Width / 2);
-            int y = (_game.Window.ClientBounds.Height / 2) - (pSprite.Height / 2);
-            _player = new PlayerSprite(pSprite, 4, 4) { Position = new Vector2(x, y) };
+            // TODO - NEED A BETTER WAY THAN THIS
+            if (_encounterInfo.Position.Equals(Vector2.Zero))
+            {
+                _encounterInfo.Position = new Vector2(
+                    (_game.Window.ClientBounds.Width / 2) - (pSprite.Width / 2),
+                    (_game.Window.ClientBounds.Height / 2) - (pSprite.Height / 2)
+                );
+            }
+            _player = new PlayerSprite(pSprite, 4, 4) { Position = _encounterInfo.Position };
             _previousKeyboardState = Keyboard.GetState();
             _stateManager.SetMain(this);
             //{ Rectangle = new Rectangle(100, 100, 50, 50) };
@@ -56,7 +63,7 @@ namespace FFClone.States
             {
                 _stack.Peek().Draw(gameTime, spriteBatch);
             }
-            spriteBatch.DrawString(_font, _encounterChance.ToString(), Vector2.Zero, Color.White);
+            spriteBatch.DrawString(_font, _encounterInfo.Chance.ToString(), Vector2.Zero, Color.White);
 
             spriteBatch.End();
             //Primitives2D.DrawRectangle(spriteBatch, new Rectangle(0, 0, 200, 200), Color.Black);
@@ -165,12 +172,13 @@ namespace FFClone.States
             }
             if (generateEnc)
             {
-                _encounterTicks += 0.02;
+                _encounterInfo.Ticks += 0.02;
 
-                _encounterChance = _rand.NextDouble() + _encounterTicks;
-                if (_encounterChance > speed)
+                _encounterInfo.Chance = _rand.NextDouble() + _encounterInfo.Ticks;
+                speed = 1;
+                if (_encounterInfo.Chance > speed)
                 {
-                    _encounterTicks = 0;
+                    _encounterInfo.Ticks = 0;
                     StateManager.Instance.Next(new BattleState(_game, _graphicsDevice, _content, this), Transition.NoTransition);
 
                 }
@@ -207,11 +215,13 @@ namespace FFClone.States
                                 {
                                     Debug.WriteLine("Do save stuff");
                                     SaveFile.Save();
+                                    _stack.Pop();
                                 }
                                 else
                                 {
                                     Debug.WriteLine("close modal stuff");
-                                    SaveFile.Load();
+                                    _stack.Pop();
+
                                 }
                             };
                         }

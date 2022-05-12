@@ -14,6 +14,7 @@ namespace FFClone
     public struct SaveGame
     {
         public List<Hero> Party;
+        public EncounterInfo EncounterInfo;
     }
     public sealed class SaveFile
     {
@@ -42,17 +43,6 @@ namespace FFClone
         private static IsolatedStorageFileStream _isolatedFileStream;
         private static IsolatedStorageFile _dataFile;
 
-        public SaveGame GetSave()
-        {
-            return _saveData;
-        }
-
-        //internal static void UpdateSave(SaveGame saveGame)
-        //{
-        //    _saveGame = saveGame;
-        //}
-
-
         public static SaveGame Load()
         {
             _dataFile = IsolatedStorageFile.GetUserStoreForDomain();
@@ -62,28 +52,42 @@ namespace FFClone
             {
                 Debug.WriteLine("File not found - start new game");
             }
-            try
+            using (_isolatedFileStream = _dataFile.OpenFile("file.sav", FileMode.Open, FileAccess.ReadWrite))
             {
-                using (_isolatedFileStream = _dataFile.OpenFile("file.sav", FileMode.Open, FileAccess.ReadWrite))
-                {
-                    saveData = (SaveGame)serializer.Deserialize(_isolatedFileStream);
-                    // Loop through nested Lists
-                    _dataFile.Close();
-                    _isolatedFileStream.Close();
-                }
-            } catch {
+                saveData = (SaveGame)serializer.Deserialize(_isolatedFileStream);
+                saveData.Party = new List<Hero>(){
+                    new Hero("John", Job.Warrior, Color.Red, "Sprites/ninja-idle", "Sprites/Portraits/1p"),
+                    new Hero("Luke", Job.Mage, Color.Blue, "Sprites/ninja-idle", "Sprites/Portraits/2p"),
+                    new Hero("Paul", Job.Thief, Color.Green, "Sprites/ninja-idle", "Sprites/Portraits/3p")
+                };
+                GameInfo.Instance.Initialize(saveData);
+                // Loop through nested Lists
+                _dataFile.Close();
+                _isolatedFileStream.Close();
             }
             if (saveData.Party.Count == 0)
             {
                 saveData.Party = new List<Hero>
                 {
-                    new Hero("John", Job.Warrior, Color.Red, "Sprites/ninja-idle", "Sprites/Portraits/1p"),
-                    new Hero("Paul", Job.Thief, Color.Green, "Sprites/ninja-idle", "Sprites/Portraits/2p"),
-                    new Hero("Luke", Job.Mage, Color.Blue, "Sprites/ninja-idle", "Sprites/Portraits/3p"),
+                    new Hero("John", Job.Warrior, Color.Red, "Sprites/ninja-idle", "Sprites/Portraits/1p")
                 };
             }
             return saveData;
         }
+
+        internal static void New()
+        {
+
+            GameInfo.Instance.Initialize(new SaveGame
+            {
+                Party = new List<Hero>()
+                {
+                    new Hero("John", Job.Warrior, Color.Red, "Sprites/ninja-idle", "Sprites/Portraits/1p")
+                },
+                EncounterInfo = new EncounterInfo()
+            });
+        }
+
         public static void Save()
         {
             _dataFile = IsolatedStorageFile.GetUserStoreForDomain();
