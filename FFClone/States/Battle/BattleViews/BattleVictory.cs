@@ -20,6 +20,7 @@ namespace FFClone.States.Battle.BattleViews
         private List<int> _centerPoints;
         private Stopwatch _stopwatch = new Stopwatch();
         private Dictionary<string, string> _stats;
+        private Point _position;
 
         public Rectangle TotalRectangle { get; set; }
         public LevelUp(Hero hero, Dictionary<string, string> oldStats, Rectangle rectangle, SpriteFont spriteFont)
@@ -28,6 +29,10 @@ namespace FFClone.States.Battle.BattleViews
             _hero = hero;
             _stats = oldStats;
             TotalRectangle = rectangle;
+            _position = new Point(
+                TotalRectangle.HorizontalPosition(),
+                TotalRectangle.VerticalPosition(5, _font.LineSpacing + 5)
+            );
             Rectangle = new Rectangle(
                 rectangle.Center.X - (int)(0.1f * rectangle.Width),
                 rectangle.Center.Y - (int)(0.1f * rectangle.Height),
@@ -48,39 +53,61 @@ namespace FFClone.States.Battle.BattleViews
             {
                 // Vertical Centering
                 // Will refactor after moving to other classes
-                int yPosition = Rectangle.Y;
-                int height = Rectangle.Height;
-                int rows = 5;
-                int rowHeight = _font.LineSpacing + 5;
-                int spaceTaken = rows * rowHeight;
-                int availableHeight = height - spaceTaken;
-                int yMargin = availableHeight / rows;
+                int yBuffer = 0;
 
                 int availableSpace = Rectangle.Width;
                 int xCenterBuffer = availableSpace / 3;
-                int leftMargin = Rectangle.X + (int)(0.5 * xCenterBuffer);
+                spriteBatch.DrawString(_font, "Stat Block", new Vector2(_centerPoints[0], _position.Y + yBuffer), Color.Black);
+                yBuffer += _font.LineSpacing;
+                List<string> x = new List<string>(){ "STR", "INT", "DEX" };
+                x.ForEach(y =>
+                {
+                    spriteBatch.DrawString(_font, y, new Vector2(_position.X + (x.IndexOf(y) * xCenterBuffer), _position.Y + yBuffer), Color.Black);
+                });
+                yBuffer += _font.LineSpacing;
 
-                spriteBatch.DrawString(_font, "Stat Block", new Vector2(_centerPoints[0], yPosition + yMargin), Color.Black);
-                yPosition += _font.LineSpacing + 5;
+                x.ForEach(y =>
+                {
+                    spriteBatch.DrawString(
+                        _font, 
+                        _stats[y], 
+                        new Vector2(
+                            _position.X + (x.IndexOf(y) * xCenterBuffer), 
+                            _position.Y + yBuffer
+                            ),
+                        Color.Black, 
+                        0, 
+                        Vector2.Zero, 
+                        _hero.Stat(y) != _stats[y] ? 1f : 1.5f, SpriteEffects.None, 1);
 
-                spriteBatch.DrawString(_font, "STR", new Vector2(leftMargin, yPosition + yMargin), Color.Black);
-                spriteBatch.DrawString(_font, "INT", new Vector2(leftMargin + xCenterBuffer, yPosition + yMargin), Color.Black);
-                spriteBatch.DrawString(_font, "DEX", new Vector2(leftMargin + xCenterBuffer + xCenterBuffer, yPosition + yMargin), Color.Black);
-                yPosition += _font.LineSpacing + 5;
+                });
+                // increase by 10 IF bold
+                yBuffer += _font.LineSpacing + 10;
 
+                x = new List<string>() { "Level", "HP" };
+                x.ForEach(y =>
+                {
+                    spriteBatch.DrawString(_font, y, new Vector2(_position.X + (x.IndexOf(y) * xCenterBuffer), _position.Y + yBuffer), Color.Black);
+                });
+                yBuffer += _font.LineSpacing;
 
-                spriteBatch.DrawString(_font, _stats["STR"], new Vector2(leftMargin, yPosition + yMargin), Color.Black, 0,Vector2.Zero, _hero.Strength.ToString() != _stats["STR"] ? 1f : 1.5f,SpriteEffects.None,1);
-                spriteBatch.DrawString(_font, _stats["INT"], new Vector2(leftMargin + xCenterBuffer, yPosition + yMargin), Color.Black, 0,Vector2.Zero, _hero.Intelligence.ToString() != _stats["INT"] ? 1f : 1.5f,SpriteEffects.None,1);
-                spriteBatch.DrawString(_font, _stats["DEX"], new Vector2(leftMargin + xCenterBuffer + xCenterBuffer, yPosition + yMargin), Color.Black, 0,Vector2.Zero, _hero.Dexterity.ToString() != _stats["DEX"] ? 1f : 1.5f,SpriteEffects.None,1);
+                x.ForEach(y =>
+                {
+                    spriteBatch.DrawString(
+                        _font,
+                        _stats[y],
+                        new Vector2(
+                            _position.X + (x.IndexOf(y) * xCenterBuffer),
+                            _position.Y + yBuffer
+                            ),
+                        Color.Black,
+                        0,
+                        Vector2.Zero,
+                        _hero.Stat(y) != _stats[y] ? 1f : 1.5f, SpriteEffects.None, 1);
 
-                yPosition += _font.LineSpacing + 10;
-                spriteBatch.DrawString(_font, "Level", new Vector2(leftMargin, yPosition + yMargin), Color.Black);
-                spriteBatch.DrawString(_font, "HP", new Vector2(leftMargin + xCenterBuffer, yPosition + yMargin), Color.Black);
-                yPosition += _font.LineSpacing + 5;
-
-
-                spriteBatch.DrawString(_font, _stats["Level"], new Vector2(leftMargin, yPosition + yMargin), Color.Black, 0,Vector2.Zero, _hero.Level.ToString() != _stats["Level"] ? 1f : 1.5f,SpriteEffects.None,1);
-                spriteBatch.DrawString(_font, _stats["HP"], new Vector2(leftMargin + xCenterBuffer, yPosition + yMargin), Color.Black, 0,Vector2.Zero, _hero.MaxHP.ToString() != _stats["HP"] ? 1f : 1.5f,SpriteEffects.None,1);
+                });
+                // increase by 10 IF bold
+                yBuffer += _font.LineSpacing + 10;
             }
         }
 
@@ -132,10 +159,19 @@ namespace FFClone.States.Battle.BattleViews
         Animating,
         AnimatingEnd
     }
+
     public class BattleVictory : BattleView
     {
+        private enum State
+        {
+            Gaining,
+            Gained,
+            Rewards,
+            Done,
+        }
+        private State _state;
+        private Modal _modal;
         private Scene _scene = Scene.Idle;
-        private bool _done = false;
         private int _remainingExp = 0;
         private int _expGain = 0;
         private List<string> _rewards = new List<string>();
@@ -144,6 +180,7 @@ namespace FFClone.States.Battle.BattleViews
         private List<Dictionary<string, string>> _oldStats = new List<Dictionary<string, string>>();
         public BattleVictory(Game1 game, GraphicsDevice graphicsDevice, ContentManager content, BattleModel battleModel) : base(game, graphicsDevice, content, battleModel)
         {
+            _state = State.Gaining;
             int spaceBetweenY = _vH / _party.Count;
 
             if (spaceBetweenY > (int)(0.25f * _vH))
@@ -183,34 +220,73 @@ namespace FFClone.States.Battle.BattleViews
                 yOffset += _font.LineSpacing;
             }
             _levelUps.ForEach(x => x.Draw(gameTime, spriteBatch));
+            if (_modal != null)
+            {
+                _modal.Draw(gameTime, spriteBatch);
+            }
 
         }
         public override void Update(GameTime gameTime)
         {
             KeyboardState ks = Keyboard.GetState();
+            if (_modal != null)
+                _modal.Update(gameTime);
+
             if (ks.IsKeyDown(Keys.Enter) && _previousKeyboard.IsKeyUp(Keys.Enter))
             {
-                if (_done)
+                switch (_state)
                 {
-                    BattleViewManager.Instance.Done(new Rectangle(0,0,_vW, _vH));
-                    return;
+                    case State.Gaining:
+                        _party.ForEach(hero => hero.IncreaseExperience(_remainingExp));
+                        _scene = Scene.AnimatingEnd;
+                        _remainingExp = 0;
+                        _state = State.Gained;
+                        break;
+                    case State.Gained:
+                        string rewards = "";
+                        _enemies.ForEach(e => rewards += $"{e.Reward}\n");
+
+                        _modal = new Modal(
+                            _font,
+                            rewards,
+                            _game.Window.ClientBounds,
+                            new Rectangle(
+                                (int)(0.2f * _vW),
+                                (int)(0.2f * _vH),
+                                (int)(0.6f * _vW),
+                                (int)(0.6f * _vH)
+                            ),
+                            (a, b) => {
+                                _modal = null;
+                                _state = State.Done;
+                            }
+                        );
+                        _state = State.Rewards;
+                        break;
+                    case State.Rewards:
+                        _modal.Call();
+                        break;
+                    case State.Done:
+                        _stateManager.Done();
+                        break;
+                    default:
+                        break;
                 }
-                _party.ForEach(hero => hero.IncreaseExperience(_remainingExp));
-                _scene = Scene.AnimatingEnd;
-                _remainingExp = 0;
-                _done = true;
             }
             _previousKeyboard = ks;
             switch (_scene)
             {
                 case Scene.Idle:
-                    _scene = Scene.AnimatingStart;
+                    if (_state == State.Gaining)
+                    {
+                        _scene = Scene.AnimatingStart;
+                    }
                     break;
                 case Scene.AnimatingStart:
                     if (_remainingExp <= 0)
                     {
                         _scene = Scene.Idle;
-                        _done = true;
+                        _state = State.Gained;
                     } else
                     {
                         _scene = Scene.Animating;
@@ -243,7 +319,13 @@ namespace FFClone.States.Battle.BattleViews
                     _scene = Scene.AnimatingEnd;
                     break;
                 case Scene.AnimatingEnd:
-                    _scene = Scene.AnimatingStart;
+                    if (_state == State.Gaining)
+                    {
+                        _scene = Scene.AnimatingStart;
+                    } else
+                    {
+                        _scene = Scene.Idle;
+                    }
                     break;
                 default:
                     break;

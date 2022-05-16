@@ -101,6 +101,19 @@ namespace FFClone.Models
             return false;
         }
 
+        internal string Stat(string y)
+        {
+            return y switch
+            {
+                "STR" => Strength.ToString(),
+                "INT" => Intelligence.ToString(),
+                "DEX" => Dexterity.ToString(),
+                "Level" => Level.ToString(),
+                "HP" => MaxHP.ToString(),
+                _ => "0",
+            };
+        }
+
         internal void LevelUp()
         {
             Level += 1;

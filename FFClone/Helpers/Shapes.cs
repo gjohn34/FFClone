@@ -1,12 +1,28 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame;
+using System;
 
 namespace FFClone.Helpers.Shapes
 {
     public static class ShapeHelper
     {
-        //public static void Center
+        public static int VerticalPosition(this Rectangle rectangle, int rows, int rowHeight)
+        {
+            int yPosition = rectangle.Y;
+            int height = rectangle.Height;
+            int spaceTaken = rows * rowHeight;
+            int availableHeight = height - spaceTaken;
+            int yMargin = availableHeight / rows;
+            return yPosition + yMargin;
+        }
+        public static int HorizontalPosition(this Rectangle rectangle)
+        {
+            int availableSpace = rectangle.Width;
+            int xCenterBuffer = availableSpace / 3;
+            int leftMargin = rectangle.X + (int)(0.5 * xCenterBuffer);
+            return leftMargin;
+        }
         public static void DrawRectangleWithFill(this SpriteBatch spriteBatch, Rectangle rectangle, int thickness, Color outline, Color fill)
         {
 
