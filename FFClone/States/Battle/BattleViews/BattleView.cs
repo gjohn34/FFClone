@@ -19,7 +19,7 @@ namespace FFClone.States.Battle.BattleViews
         protected int _vW;
         protected SpriteFont _font;
         protected BattleModel _battleModel;
-        protected StateManager _stateManager;
+        protected BattleViewManager _stateManager;
         protected KeyboardState _previousKeyboard;
         protected List<Hero> _party;
         protected List<Enemy> _enemies;
@@ -35,6 +35,7 @@ namespace FFClone.States.Battle.BattleViews
             _battleModel = battleModel;
             _party = battleModel.Party;
             _enemies = battleModel.Enemies;
+            _stateManager = BattleViewManager.Instance;
         }
         public abstract void Update(GameTime gameTime);
         public abstract void Draw(GameTime gameTime, SpriteBatch spriteBatch);

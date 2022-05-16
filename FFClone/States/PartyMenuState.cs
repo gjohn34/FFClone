@@ -29,8 +29,6 @@ namespace FFClone.States
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            int x = 100;
-            int y = 100;
             spriteBatch.Begin();
             int spaceBetweenY = _vH / _portraits.Count;
             if (spaceBetweenY > (int)(0.25f * _vH))
