@@ -41,8 +41,8 @@ namespace FFClone.States
             };
 
             List<Enemy> enemies = new List<Enemy> {
-                //new Enemy("Purple Guy 1", Color.Purple, statBlock),
-                //new Enemy("Purple Guy 2", Color.Purple, statBlock),
+                new Enemy("Purple Guy 1", Color.Purple, statBlock),
+                new Enemy("Purple Guy 2", Color.Purple, statBlock),
                 //new Enemy("Purple Guy 3", Color.Purple, statBlock),
                 new Enemy("Purple Guy 4", Color.Purple, statBlock)
             };
