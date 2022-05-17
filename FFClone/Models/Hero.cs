@@ -1,4 +1,5 @@
-﻿using FFClone.Sprites;
+﻿using FFClone.Controls;
+using FFClone.Sprites;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -15,8 +16,8 @@ namespace FFClone.Models
         public string Name { get; }
         public int HP { get; set; }
         public int MaxHP { get; set; }
-        public List<string> Options { get; set; }
-        public List<string> Spells { get; set; }
+        public List<Action> Options { get; set; }
+        public List<Spell> Spells { get; set; }
 
         public Vector2 HomePosition { get; set; }
         public Vector2 MoveByTick { get; set; }
@@ -44,8 +45,8 @@ namespace FFClone.Models
     {
         public string Portrait { get; set; }
         public Job Job { get; }
-        public List<string> Spells { get; set; } = new List<string>();
-        public List<string> Options { get; set; }
+        public List<Spell> Spells { get; set; } = new List<Spell>();
+        public List<Action> Options { get; set; }
         public int Experience { get; set; }
         public int ToNextLevel { get; set; } = 9;
         internal Dictionary<string, string> OldStats
@@ -69,7 +70,12 @@ namespace FFClone.Models
             if (Job == Job.Mage)
             {
                 //Spells = new List<string> { "Fireball", "Ice Bolt", "Thunder"};
-                Spells = new List<string> { "Fireball", "Ice Bolt", "Thunder", "Aero", "Blizzard", "Darkness", "Holy Lance", "Water Whip", "Mind Blast", "Heal", "Flizz", "Biz", "Bang" };
+                Spells = new List<Spell> {
+                    new Spell("Fireball"),
+                    new Spell("Thunder"),
+                    new Spell("Aero")
+                };
+                    //"Fireball", "Ice Bolt", "Thunder", "Aero", "Blizzard", "Darkness", "Holy Lance", "Water Whip", "Mind Blast", "Heal", "Flizz", "Biz", "Bang" };
             }
             GenerateStats();
             Portrait = portraitPath;
@@ -78,13 +84,21 @@ namespace FFClone.Models
 
         private void SetUpOptions()
         {
-            Options = Job switch
-            {
-                Job.Warrior => new List<string> { "Attack", "Defend", "Ability" },
-                Job.Mage => new List<string> { "Attack", "Defend", "Spell", "Ability" },
-                Job.Thief => new List<string> { "Attack", "Defend", "Ability" },
-                _ => new List<string> { "Attack" },
+            Options = new List<Action> { 
+                new Action("Attack"),
+                new Action("Defend")
             };
+            if (Job == Job.Mage)
+            {
+                Options.Add(new Action("Spell"));
+            }
+            //Options = Job switch
+            //{
+            //    Job.Warrior => new List<string> { "Attack", "Defend", "Ability" },
+            //    Job.Mage => new List<string> { "Attack", "Defend", "Spell", "Ability" },
+            //    Job.Thief => new List<string> { "Attack", "Defend", "Ability" },
+            //    _ => new List<string> { "Attack" },
+            //};
         }
 
 

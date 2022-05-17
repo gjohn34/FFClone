@@ -101,7 +101,7 @@ namespace FFClone.Controls
         private int _margin;
         private MenuList _options;
 
-        public ConfirmationModal(SpriteFont font, string label, string option1, string option2, Rectangle gameWindow, Func<string, EventHandler> eventHandler)
+        public ConfirmationModal(SpriteFont font, string label, IMenuOption option1, IMenuOption option2, Rectangle gameWindow)
         {
             Open = true;
             _vW = gameWindow.Width;
@@ -111,14 +111,14 @@ namespace FFClone.Controls
             _label = WrapText(label);
             _margin = ((int)(Rectangle.Width - _font.MeasureString(_label).X) - (2 * 5)) / 2; // left and right border -5
             _options = new MenuList(
-                new List<string> { option1, option2 },
+                new List<IMenuOption> { option1, option2 },
                 new Rectangle(
                     Rectangle.X, 
                     Rectangle.Y + (int)(_font.MeasureString(_label).Y), 
                     Rectangle.Width, 
                     (int)(Rectangle.Height - _font.MeasureString(_label).Y)),
                 _font, 
-                eventHandler, 
+                //eventHandler, 
                 Orientation.Horizontal, 2);
         }
         private string WrapText(string text)

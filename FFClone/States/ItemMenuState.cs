@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Input;
+using System.Diagnostics;
 
 namespace FFClone.States
 {
@@ -17,10 +18,11 @@ namespace FFClone.States
         public ItemMenuState(Game1 game, GraphicsDevice graphicsDevice, ContentManager content) : base(game, graphicsDevice, content)
         {
             _list = new MenuList(
-                new List<string> { "Potion", "Hi-Potion", "Wa'er" },
+                GameInfo.Instance.Inventory.Items.ConvertAll<IMenuOption>(x => new MenuOption(x.Name, (a,b) => { })),
+                //new List<string> { "Potion", "Hi-Potion", "Wa'er" },
                 new Rectangle((int)(0.1 * _vW), (int)(0.1 * _vH), _vW - (int)(0.2 * _vW), _vH - (int)(0.2 * _vH)),
                 _font,
-                Handler,
+                //Handler,
                 Orientation.Horizontal,
                 3
             );
@@ -28,7 +30,10 @@ namespace FFClone.States
 
         public EventHandler Handler(string x)
         {
-            return (a,b) => { };
+            return (a,b) => {
+                Debug.WriteLine(x); 
+                
+            };
         }
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)

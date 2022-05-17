@@ -8,6 +8,23 @@ using System;
 using System.Collections.Generic;
 namespace FFClone.Controls
 {
+    public interface IMenuOption
+    {
+        public string Label { get; set; }
+        public EventHandler OnSubmit { get; set; }
+
+    }
+    public class MenuOption: IMenuOption
+    {
+        public string Label { get; set; }
+        public EventHandler OnSubmit { get; set; }
+        public MenuOption(string label, EventHandler onSubmit)
+        {
+            Label = label;
+            OnSubmit = onSubmit;
+        }
+
+    }
     public class MenuItem : IComponent
     {
         private SpriteFont _font;
@@ -17,16 +34,17 @@ namespace FFClone.Controls
         private Color FillColor { get; set; }
         public bool Selected { get; internal set; }
         public bool Pressed { get; internal set; }
-
-        private EventHandler OnSubmit;
+        public string Label { get; set; }
+        private EventHandler _onSubmit { get; set; }
 
         public MenuItem(string text, Rectangle rectangle, SpriteFont font, Color color, EventHandler onSubmit)
         {
             Text = text;
+            Label = text;
             Rectangle = rectangle;
             _font = font;
             FillColor = color;
-            OnSubmit = onSubmit;
+            _onSubmit = onSubmit;
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -48,7 +66,7 @@ namespace FFClone.Controls
         {
             if (Pressed)
             {
-                OnSubmit?.Invoke(this, new EventArgs());
+                _onSubmit?.Invoke(this, new EventArgs());
                 Pressed = false;
             }
         }
@@ -77,7 +95,12 @@ namespace FFClone.Controls
 
         public List<MenuItem> MenuItems { get; set; } = new List<MenuItem>();
         private int Selected { get; set; } = 0;
-        public MenuList(List<string> menuItems, Rectangle rectangle, SpriteFont spriteFont, Func<string, EventHandler> onSubmit, Orientation orientation = Orientation.Vertical, int columns = 1, float opacity = 0f)
+        public MenuList(
+            List<IMenuOption> menuItems, 
+            Rectangle rectangle, 
+            SpriteFont spriteFont, 
+            Orientation orientation = Orientation.Vertical, int columns = 1, float opacity = 0f
+        )
         {
             _orientation = orientation;
             _columns = columns;
@@ -88,10 +111,10 @@ namespace FFClone.Controls
             _rows = (int)Math.Ceiling((decimal)menuItems.Count / columns);
             if (_orientation == Orientation.Horizontal)
             {
-                foreach (string option in menuItems)
+                foreach (IMenuOption option in menuItems)
                 {
-                    int fontWidth = (int)spriteFont.MeasureString(option).X;
-                    int fontHeight = (int)spriteFont.MeasureString(option).Y;
+                    int fontWidth = (int)spriteFont.MeasureString(option.Label).X;
+                    int fontHeight = (int)spriteFont.MeasureString(option.Label).Y;
                     if (fontWidth > _minCellWidth)
                         _minCellWidth = fontWidth;
                     if (fontHeight > _minCellHeight)
@@ -101,7 +124,13 @@ namespace FFClone.Controls
             }
             for (int i = 0; i < menuItems.Count; i++)
             {
-                MenuItems.Add(new MenuItem(menuItems[i], GeneratePosition(i, menuItems.Count), spriteFont, Color.Gray, onSubmit(menuItems[i])));
+                MenuItems.Add(new MenuItem(
+                    menuItems[i].Label,
+                    GeneratePosition(i, menuItems.Count),
+                    spriteFont,
+                    Color.Gray,
+                    menuItems[i].OnSubmit
+                ));
             }
             MenuItems[Selected].Selected = true;
 
@@ -155,6 +184,10 @@ namespace FFClone.Controls
                     Rectangle rect = new Rectangle(initialXPos, initialYPos, _minCellWidth, _minCellHeight);
                     return rect;
                 case Orientation.Vertical:
+
+                    if (length == 1)
+                        return new Rectangle(Rectangle.X, Rectangle.Center.Y - (int)(0.5f * (Rectangle.Height / 3)), Rectangle.Width, Rectangle.Height / 3);
+
                     spaceBetweenY = Rectangle.Height / length;
                     cellHeight = (int)Math.Ceiling((0.75 * spaceBetweenY));
 
