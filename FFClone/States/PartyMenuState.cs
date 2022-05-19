@@ -19,10 +19,9 @@ namespace FFClone.States
         private State _sender;
         private List<Texture2D> _portraits = new List<Texture2D>();
 
-        public PartyMenuState(Game1 game, GraphicsDevice graphicsDevice, ContentManager content, State sender) : base(game, graphicsDevice, content)
+        public PartyMenuState(Game1 game, GraphicsDevice graphicsDevice, ContentManager content) : base(game, graphicsDevice, content)
         {
             _party = _gameInfo.Party;
-            _sender = sender;
             _party.ForEach(hero => _portraits.Add(content.Load<Texture2D>(hero.Portrait)));
 
         }
@@ -86,7 +85,7 @@ namespace FFClone.States
             KeyboardState k = Keyboard.GetState();
             if (_previousKeyboard.IsKeyDown(Keys.Escape) && k.IsKeyUp(Keys.Escape))
             {
-                _stateManager.Next(_sender, Transition.NoTransition);
+                _stateManager.Back();
             }
             _previousKeyboard = k;
         }

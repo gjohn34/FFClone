@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame;
 using System;
+using System.Runtime.InteropServices;
 
 namespace FFClone.Helpers.Shapes
 {
@@ -38,9 +39,12 @@ namespace FFClone.Helpers.Shapes
             // fill
             spriteBatch.FillRectangle(new Rectangle(rectangle.X, rectangle.Y + thickness, rectangle.Width - thickness, rectangle.Height - thickness), fill);
         }
-        public static void ProgressBar(this SpriteBatch spriteBatch, SpriteFont font, string label, int starting, int ending, Color leftFill, Color rightFill, Rectangle rectangle)
+        public static void ProgressBar(this SpriteBatch spriteBatch, SpriteFont font, string label, int starting, int ending, Color leftFill, Color rightFill, Rectangle rectangle, bool showLabel = true)
         {
-            spriteBatch.DrawString(font, $"{label} : {starting}/{ending}", new Vector2(rectangle.X, rectangle.Y), Color.Black);
+            if (showLabel)
+            {
+                spriteBatch.DrawString(font, $"{label} : {starting}/{ending}", new Vector2(rectangle.X, rectangle.Y), Color.Black);
+            }
             int barWidth = rectangle.Width;
             int width = (int)(((double)starting / ending) * barWidth);
             int barHeight = rectangle.Height;
@@ -49,7 +53,7 @@ namespace FFClone.Helpers.Shapes
             ////hp missing
             spriteBatch.DrawRectangleWithFill(new Rectangle(rectangle.X + width, rectangle.Y + font.LineSpacing, barWidth - width, barHeight), 0, rightFill, rightFill);
             //hp bar outline
-            spriteBatch.DrawRectangle(new Rectangle(rectangle.X, rectangle.Y + font.LineSpacing, 100, 20), Color.Black);
+            spriteBatch.DrawRectangle(new Rectangle(rectangle.X, rectangle.Y + font.LineSpacing, rectangle.Width, rectangle.Height), Color.Black);
         }
     }
 }

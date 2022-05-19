@@ -8,43 +8,55 @@ using System;
 using System.Collections.Generic;
 namespace FFClone.Controls
 {
-    public interface IMenuOption
+    public interface IMenuOption : IComponent
     {
         public string Label { get; set; }
         public EventHandler OnSubmit { get; set; }
+        public bool Selected { get; set; }
+        public bool Pressed { get; set; }
 
     }
-    public class MenuOption: IMenuOption
+    public class MenuOption : IMenuOption
     {
         public string Label { get; set; }
         public EventHandler OnSubmit { get; set; }
+        public Rectangle Rectangle { get; set; }
+        public bool Selected { get;  set; }
+        public bool Pressed { get; set; }
+
         public MenuOption(string label, EventHandler onSubmit)
         {
             Label = label;
             OnSubmit = onSubmit;
         }
 
+        public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+        {
+        }
+
+        public void Update(GameTime gameTime)
+        {
+        }
+
+        public void Resized()
+        {
+        }
     }
-    public class MenuItem : IComponent
+    public class MenuItem : IMenuOption
     {
         private SpriteFont _font;
-
-        public string Text { get; set; }
         public Rectangle Rectangle { get; set; }
-        private Color FillColor { get; set; }
-        public bool Selected { get; internal set; }
-        public bool Pressed { get; internal set; }
+        private Color FillColor { get; set; } = Color.Gray;
+        public bool Selected { get; set; }
+        public bool Pressed { get; set; }
         public string Label { get; set; }
-        private EventHandler _onSubmit { get; set; }
+        public EventHandler OnSubmit { get; set; }
 
-        public MenuItem(string text, Rectangle rectangle, SpriteFont font, Color color, EventHandler onSubmit)
+        public MenuItem(string text, SpriteFont font, EventHandler onSubmit)
         {
-            Text = text;
             Label = text;
-            Rectangle = rectangle;
             _font = font;
-            FillColor = color;
-            _onSubmit = onSubmit;
+            OnSubmit = onSubmit;
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -53,12 +65,12 @@ namespace FFClone.Controls
             //Primitives2D.DrawRectangle(spriteBatch, new Rectangle(Rectangle.X - 1, Rectangle.Y - 1, Rectangle.Width + 2, Rectangle.Height + 2), Color.Black);
             //Primitives2D.FillRectangle(spriteBatch, Rectangle, Selected ? FillColor : Color.MediumVioletRed);
 
-            if (!string.IsNullOrEmpty(Text))
+            if (!string.IsNullOrEmpty(Label))
             {
-                var x = (Rectangle.X + (Rectangle.Width / 2)) - (_font.MeasureString(Text).X / 2);
-                var y = (Rectangle.Y + (Rectangle.Height / 2)) - (_font.MeasureString(Text).Y / 2);
+                var x = (Rectangle.X + (Rectangle.Width / 2)) - (_font.MeasureString(Label).X / 2);
+                var y = (Rectangle.Y + (Rectangle.Height / 2)) - (_font.MeasureString(Label).Y / 2);
 
-                spriteBatch.DrawString(_font, Text, new Vector2(x, y), Color.Black);
+                spriteBatch.DrawString(_font, Label, new Vector2(x, y), Color.Black);
             }
         }
 
@@ -66,7 +78,7 @@ namespace FFClone.Controls
         {
             if (Pressed)
             {
-                _onSubmit?.Invoke(this, new EventArgs());
+                OnSubmit?.Invoke(this, new EventArgs());
                 Pressed = false;
             }
         }
@@ -93,12 +105,12 @@ namespace FFClone.Controls
         private int _rows;
         private float _opacity = 1f;
 
-        public List<MenuItem> MenuItems { get; set; } = new List<MenuItem>();
+        public List<IMenuOption> MenuItems { get; set; }
         private int Selected { get; set; } = 0;
         public MenuList(
-            List<IMenuOption> menuItems, 
-            Rectangle rectangle, 
-            SpriteFont spriteFont, 
+            List<IMenuOption> menuItems,
+            Rectangle rectangle,
+            SpriteFont spriteFont,
             Orientation orientation = Orientation.Vertical, int columns = 1, float opacity = 0f
         )
         {
@@ -122,23 +134,28 @@ namespace FFClone.Controls
                 }
 
             }
-            for (int i = 0; i < menuItems.Count; i++)
+            MenuItems = menuItems;
+            foreach (IMenuOption option in MenuItems)
             {
-                MenuItems.Add(new MenuItem(
-                    menuItems[i].Label,
-                    GeneratePosition(i, menuItems.Count),
-                    spriteFont,
-                    Color.Gray,
-                    menuItems[i].OnSubmit
-                ));
+                option.Rectangle = GeneratePosition(MenuItems.IndexOf(option), MenuItems.Count);
             }
+            //{
+            //    MenuItems.Add(new MenuItem(
+            //        menuItems[i].Label,
+            //        GeneratePosition(i, menuItems.Count),
+            //        spriteFont,
+            //        Color.Gray,
+            //        menuItems[i].OnSubmit
+            //    ));
+            //}
             MenuItems[Selected].Selected = true;
 
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
+            spriteBatch.DrawRectangle(Rectangle, Color.White);
             spriteBatch.DrawRectangleWithFill(Rectangle, 0, Color.Black, _orientation == Orientation.Vertical ? Color.White : Color.Black * _opacity);
-            foreach (MenuItem menuItem in MenuItems)
+            foreach (IMenuOption menuItem in MenuItems)
                 menuItem.Draw(gameTime, spriteBatch);
 
             //_selector.Draw(gameTime, spriteBatch);
@@ -263,7 +280,7 @@ namespace FFClone.Controls
                 MenuItems[Selected].Selected = true;
             }
             _previousState = state;
-            foreach (MenuItem menuItem in MenuItems)
+            foreach (IComponent menuItem in MenuItems)
                 menuItem.Update(gameTime);
         }
     }

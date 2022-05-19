@@ -97,29 +97,20 @@ namespace FFClone.Controls
         private int _vH;
         private int _vW;
         private SpriteFont _font;
-        private string _label;
+        public string Label;
         private int _margin;
         private MenuList _options;
 
-        public ConfirmationModal(SpriteFont font, string label, IMenuOption option1, IMenuOption option2, Rectangle gameWindow)
+        public ConfirmationModal(SpriteFont font, string label, MenuList list, Rectangle gameWindow)
         {
             Open = true;
             _vW = gameWindow.Width;
             _vH = gameWindow.Height;
             Rectangle = new Rectangle((int)(0.3f * _vW), (int)(0.3f * _vH), (int)(0.3f * _vW), (int)(0.3f * _vH));
             _font = font;
-            _label = WrapText(label);
-            _margin = ((int)(Rectangle.Width - _font.MeasureString(_label).X) - (2 * 5)) / 2; // left and right border -5
-            _options = new MenuList(
-                new List<IMenuOption> { option1, option2 },
-                new Rectangle(
-                    Rectangle.X, 
-                    Rectangle.Y + (int)(_font.MeasureString(_label).Y), 
-                    Rectangle.Width, 
-                    (int)(Rectangle.Height - _font.MeasureString(_label).Y)),
-                _font, 
-                //eventHandler, 
-                Orientation.Horizontal, 2);
+            Label = WrapText(label);
+            _margin = ((int)(Rectangle.Width - _font.MeasureString(Label).X) - (2 * 5)) / 2; // left and right border -5
+            _options = list;
         }
         private string WrapText(string text)
         {
@@ -154,7 +145,7 @@ namespace FFClone.Controls
         {
             spriteBatch.DrawRectangleWithFill(new Rectangle(0,0, _vW, _vH), 0, Color.Black, Color.Black * 0.5f);
             spriteBatch.DrawRectangleWithFill(Rectangle, 5, Color.Black, Color.Salmon);
-            spriteBatch.DrawString(_font, _label, new Vector2(Rectangle.X + _margin, Rectangle.Y + _margin), Color.Black);
+            spriteBatch.DrawString(_font, Label, new Vector2(Rectangle.X + _margin, Rectangle.Center.Y - _font.MeasureString(Label).Y), Color.Black);
             _options.Draw(gameTime, spriteBatch);
         }
 
@@ -168,3 +159,4 @@ namespace FFClone.Controls
         }
     }
 }
+

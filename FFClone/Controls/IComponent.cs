@@ -19,28 +19,23 @@ namespace FFClone.Controls
 
     public class TestComponent : IComponent
     {
-        private KeyboardState _previous;
         public Rectangle Rectangle { get; set; }
-        public EventHandler OnSubmit { get; set; }
-        public TestComponent(Rectangle rectangle, EventHandler onSubmit)
+        public string Label { get; set; }
+
+        private SpriteFont _font;
+
+        public TestComponent(Rectangle rectangle, string label, SpriteFont spriteFont)
         {
-            _previous = Keyboard.GetState();
             Rectangle = rectangle;
-            OnSubmit = onSubmit;
+            Label = label;
+            _font = spriteFont;
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch) {
             spriteBatch.DrawRectangleWithFill(Rectangle, 1, Color.Black, Color.White);
+            spriteBatch.DrawString(_font, Label, Rectangle.Center.ToVector2(), Color.Black);
         }
-        public void Update(GameTime gameTime) {
-            KeyboardState keyboard = Keyboard.GetState();
-
-            if (keyboard.Released(_previous, Keys.Enter)) 
-            {
-                OnSubmit.Invoke(null, new EventArgs());
-            }
-            _previous = keyboard;
-        }
+        public void Update(GameTime gameTime) {}
         public void Resized() { }
 
     }

@@ -31,8 +31,18 @@ namespace FFClone.States
             };
 
             int width = (int)Math.Ceiling(_game.Window.ClientBounds.Width * 0.2);
+            List<IMenuOption> list = new List<IMenuOption>();
+            for (int i = 0; i < options.Count; i++)
+            {
+                list.Add(new MenuItem(
+                    options[i].Label,
+                    _font,
+                    options[i].OnSubmit
+                ));
+            }
+
             _menuList = new MenuList(
-                options,
+                list,
                 new Rectangle(_game.Window.ClientBounds.Width - width, 0, width, _game.Window.ClientBounds.Height),
                 _font
                 //HandleHandlers

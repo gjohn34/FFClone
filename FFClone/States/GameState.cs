@@ -22,41 +22,55 @@ namespace FFClone.States
         private KeyboardState _previousKeyboardState;
         private EncounterInfo _encounterInfo;
         private Random _rand = new Random();
-        internal MenuList menuList { get
+        internal MenuList menuList { 
+            get
             {
                 List<IMenuOption> options = new List<IMenuOption>
                 {
-                    new MenuOption("Party",(object a, EventArgs e) => {
-                    _stack.Pop();
-                    _stateManager.Next(new PartyMenuState(_game, _graphicsDevice, _content, this), Transition.NoTransition);
-                }),
-                    new MenuOption("Items", (object a, EventArgs e) => _stateManager.Next(new ItemMenuState(_game, _graphicsDevice, _content), Transition.NoTransition)),
-                    new MenuOption("Config",(a, e) => { }),
-                    new MenuOption("Save", (object a, EventArgs e) => {
-                    _stack.Push(new ConfirmationModal(
-                        _font,
-                        "Overwrite existing save data?",
-                        new MenuOption("yes", (a,b) => {
-                            Debug.WriteLine("Do save stuff");
-                            SaveFile.Save();
-                            _stack.Pop();
-                            }),
-                        new MenuOption("no", (a,b) =>
-                            {
-                                Debug.WriteLine("close modal stuff");
+                    new MenuItem("Party", _font, (object a, EventArgs e) => _stateManager.Next(new PartyMenuState(_game, _graphicsDevice, _content), Transition.NoTransition)),
+                    new MenuItem("Items",  _font,(object a, EventArgs e) => _stateManager.Next(new ItemMenuState(_game, _graphicsDevice, _content), Transition.NoTransition)),
+                    new MenuItem("Config", _font,(a, e) => { }),
+                    new MenuItem("Save",  _font,(object a, EventArgs e) => {
+                        string label = "Overwrite existing save data?";
+                        List<IMenuOption> list = new List<IMenuOption>
+                        {
+                            new MenuItem("yes", _font, (a,b) => {
+                                Debug.WriteLine("Do save stuff");
+                                SaveFile.Save();
                                 _stack.Pop();
-                            }),
-                        _game.Window.ClientBounds
-                    ));
-                })
+                                }),
+                            new MenuItem("no",_font, (a,b) =>
+                                {
+                                    Debug.WriteLine("close modal stuff");
+                                    _stack.Pop();
+                                })
+                        };
+
+                        Rectangle r = new Rectangle((int)(0.3f * _vW), (int)(0.3f * _vH), (int)(0.3f * _vW), (int)(0.3f * _vH));
+
+                        Rectangle y = new Rectangle(
+                            r.X,
+                            r.Y + (int)(_font.MeasureString(label).Y),
+                            r.Width,
+                            (int)(r.Height - _font.MeasureString(label).Y)
+                        );
+
+                        MenuList menulist = new MenuList(list, y, _font, Orientation.Horizontal, list.Count);
+                        _stack.Push(new ConfirmationModal(
+                            _font,
+                            label,
+                            menulist,
+                            _game.Window.ClientBounds
+                        ));
+                    })
                 };
+
                 int width = (int)Math.Ceiling(_vW * 0.2);
+               
                 return new MenuList(
                     options,
-                    //new List<string> { "Party", "Items", "Config", "Save" },
                     new Rectangle(_vW - width, 0, width, _vH),
                     _font
-                    //HandleHandlers
                 );
             } 
         }
@@ -95,18 +109,17 @@ namespace FFClone.States
             spriteBatch.End();
             //Primitives2D.DrawRectangle(spriteBatch, new Rectangle(0, 0, 200, 200), Color.Black);
         }
-
         public override void Update(GameTime gameTime)
         {
             KeyboardState keyboardState = Keyboard.GetState();
             if (_stack.Count > 0)
             {
+                _stack.Peek().Update(gameTime);
                 if (keyboardState.IsKeyDown(Keys.Escape) && _previousKeyboard.IsKeyUp(Keys.Escape)){
                     _stack.Pop();
                     _previousKeyboard = keyboardState;
                     return;
                 }
-                _stack.Peek().Update(gameTime);
                 _previousKeyboard = keyboardState;
                 return;
             }
@@ -218,44 +231,5 @@ namespace FFClone.States
             _player.Playing = playing;
             _player.Update(gameTime);
         }
-        //public EventHandler HandleHandlers(string option)
-        //{
-        //    return option switch
-        //    {
-        //        "Party" => (object a, EventArgs e) => {
-        //            _stack.Pop();
-        //            _stateManager.Next(new PartyMenuState(_game, _graphicsDevice, _content, this), Transition.NoTransition);
-        //        },
-        //        "Items" => (object a, EventArgs e) => _stateManager.Next(new ItemMenuState(_game, _graphicsDevice, _content), Transition.NoTransition),
-        //        "Config" => (a, e) => { },
-        //        "Save" => (object a, EventArgs e) => {
-        //            _stack.Push(new ConfirmationModal(
-        //                _font,
-        //                "Overwrite existing save data?",
-        //                "yes",
-        //                "no",
-        //                _game.Window.ClientBounds,
-        //                (string option) =>
-        //                {
-        //                    return (a, b) => {
-        //                        if (option == "yes")
-        //                        {
-        //                            Debug.WriteLine("Do save stuff");
-        //                            SaveFile.Save();
-        //                            _stack.Pop();
-        //                        }
-        //                        else
-        //                        {
-        //                            Debug.WriteLine("close modal stuff");
-        //                            _stack.Pop();
-
-        //                        }
-        //                    };
-        //                }
-        //            ));
-        //        },
-        //        _ => (a, e) => { }
-        //    };
-        //}
     }
 }

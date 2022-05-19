@@ -146,14 +146,14 @@ namespace FFClone.Models
                     Dexterity = 2;
                     Intelligence = 1;
                     MaxHP = 20;
-                    HP = 20;
+                    HP = 10;
                     break;
                 case Job.Mage:
                     Strength = 1;
                     Dexterity = 1;
                     Intelligence = 5;
                     MaxHP = 10;
-                    HP = 10;
+                    HP = 8;
                     break;
                 case Job.Thief:
                     Strength = 2;
@@ -166,17 +166,6 @@ namespace FFClone.Models
                     throw new Exception();
             }
         }
-        //private int CalculateBattleDamage()
-        //{
-        //    int baseAttackDamage = 1;
-        //    return Class switch
-        //    {
-        //        Job.Warrior => baseAttackDamage + (3 * Strength) + Dexterity,
-        //        Job.Mage => baseAttackDamage + (int)(0.5 * (Strength + Dexterity)),
-        //        Job.Thief => baseAttackDamage + Strength + (2 * Dexterity),
-        //        _ => baseAttackDamage,
-        //    };
-        //}
         public BattleSprite BattleSprite { get; set ; }
         public Vector2 HomePosition { get; set; }
         public Vector2 MoveByTick { get; set; }
@@ -187,6 +176,15 @@ namespace FFClone.Models
             return 1;
         }
 
+        internal void GiveItem(Item item)
+        {
+            item.Quantity -= 1;
+            HP += item.Potency;
+            if (HP > MaxHP)
+            {
+                HP = MaxHP;
+            }
+        }
     }
 
 }

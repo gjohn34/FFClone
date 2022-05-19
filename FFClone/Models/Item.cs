@@ -4,6 +4,10 @@ using System.Text;
 
 namespace FFClone.Models
 {
+    public interface IHealItem
+    {
+        public int HealBy { get; set; }
+    }
     public class Item
     {
         public int Id { get; set; }
@@ -15,5 +19,6 @@ namespace FFClone.Models
             Name = name;
             Quantity = quantity;
         }
+        public int Potency { get; set; } = 5;
     }
 }
