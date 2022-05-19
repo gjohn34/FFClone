@@ -48,7 +48,7 @@ namespace FFClone.Controls
             int menuYPos = _vH - height + _thickness;
             int commandWidth = (int)(_vW * 0.35);
 
-            List<IMenuOption> options = _battle.Current.Options.ConvertAll<IMenuOption>(x => new MenuOption(x.Name, HandleHandlers(x)));
+            List<IMenuOption> options = _battle.Current.Options.ConvertAll<IMenuOption>(x => new MenuItem(x.Name, _font, HandleHandlers(x)));
 
             _commandMenu = new MenuList(
                 options,
@@ -144,7 +144,7 @@ namespace FFClone.Controls
                 },
                 "Spell" => (object a, EventArgs e) => {
                     _menuStack.Push(new MenuList(
-                        _battle.Current.Spells.ConvertAll<IMenuOption>(x => new MenuOption(x.Name, (a, b) =>
+                        _battle.Current.Spells.ConvertAll<IMenuOption>(x => new MenuItem(x.Name, _font, (a, b) =>
                         {
                             _menuStack.Pop();
                             _battle.EnablePrompt(GetVectors(), x);
@@ -170,7 +170,7 @@ namespace FFClone.Controls
         {
             _menuStack.Clear();
             _commandMenu = new MenuList(
-                _battle.Current.Options.ConvertAll<IMenuOption>(x => new MenuOption(x.Name, HandleHandlers(x))),
+                _battle.Current.Options.ConvertAll<IMenuOption>(x => new MenuItem(x.Name, _font, HandleHandlers(x))),
                 new Rectangle(Rectangle.X, _vH - (int)(_vH * 0.3) + _thickness, (int)(_vW * 0.35) - Rectangle.X, (int)(_vH * 0.3) - (2 * Rectangle.X) - 1),
                 _font
                 //HandleHandlers
