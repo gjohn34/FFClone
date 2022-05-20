@@ -9,13 +9,19 @@ namespace FFClone.Models
 {
     public class Enemy : Character, IBattleable
     {
-        public string Reward = "A new car";
+        public Item Reward;
         public List<Spell> Spells { get; set; }
 
         public int ExperienceGain {get; set; }
         public Enemy(string name, Color color, Dictionary<string, int> statBlock) : base(name, color, "Sprites/monster")
         {
             GenerateStats(statBlock);
+            GenerateReward();
+        }
+
+        private void GenerateReward()
+        {
+            Reward = new Item(1, "A new car", 1);
         }
 
         private void GenerateStats(Dictionary<string, int> statBlock)
