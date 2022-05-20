@@ -19,6 +19,7 @@ namespace FFClone.Models
             Name = name;
             Quantity = quantity;
         }
+        public Item() { }
         public int Potency { get; set; } = 5;
     }
 }

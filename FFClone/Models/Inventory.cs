@@ -4,6 +4,7 @@ using System.Text;
 
 namespace FFClone.Models
 {
+    [Serializable]
     public class Inventory
     {
         public List<Item> Items { get; set; }
@@ -11,27 +12,39 @@ namespace FFClone.Models
         {
             Items = items;
         }
-        //public List<IMenuItem> ToMenuList()
-        //{
-            
-        //}
+        public Inventory()
+        {
+            Items = new List<Item>();
+        }
         public void Add(Item item)
         {
             int index = GetIndex(item);
             if (index == -1)
+            {
+                Items.Add(item);
                 return;
+            }
 
             Items[GetIndex(item)].Quantity += item.Quantity;
         }
-        public void Remove(Item item)
+        public void Merge(Inventory inventory)
+        {
+            inventory.Items.ForEach(x => Items.Add(x));
+        }
+
+        public bool Remove(Item item)
         {
             int index = GetIndex(item);
             if (index == -1)
-                return;
+                return false;
 
-            Items[index].Quantity -= item.Quantity;
+            Items[index].Quantity -= 1;
             if (Items[index].Quantity <= 0)
+            {
                 Items.RemoveAt(index);
+                return false;
+            }
+            return true;
 
         }
         private bool HasItem(Item item)

@@ -12,7 +12,7 @@ namespace FFClone
         private static readonly object padlock = new object();
         public List<Hero> Party { get; private set; }
         public EncounterInfo EncounterInfo { get; private set; } = new EncounterInfo();
-        internal SaveGame ToSave => new SaveGame { Party = Party, EncounterInfo = EncounterInfo };
+        internal SaveGame ToSave => new SaveGame { Party = Party, EncounterInfo = EncounterInfo, Inventory = Inventory };
         public Inventory Inventory { get; set; }
 
         GameInfo()
@@ -37,12 +37,7 @@ namespace FFClone
         {
             Party = saveData.Party;
             EncounterInfo = saveData.EncounterInfo;
-            Inventory = new Inventory(new List<Item>()
-            {
-                new Item(1, "Potion", 10),
-                new Item(2, "Hi-Potion", 3),
-                new Item(4, "Phoenix Down", 2)
-            });
+            Inventory = saveData.Inventory;
         }
     }
 

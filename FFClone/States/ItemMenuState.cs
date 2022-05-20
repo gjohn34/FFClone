@@ -122,6 +122,7 @@ namespace FFClone.States
     internal class ItemMenuState : State
     {
         private List<Hero> _party = GameInfo.Instance.Party;
+        private Inventory _inventory = GameInfo.Instance.Inventory;
         private MenuList _list;
         private List<IMenuOption> _portraits;
         private MenuList _portraitList;
@@ -150,15 +151,23 @@ namespace FFClone.States
 
             _portraitList = new MenuList(_portraits, portraitsGroupRectangle, _font, Orientation.Horizontal, _portraits.Count);
 
+            List<IMenuOption> newList = _inventory.Items.ConvertAll<IMenuOption>(x => new MenuItem(x.Name, _font, (a, b) => Handler(x)));
 
-            _list = new MenuList(
-                GameInfo.Instance.Inventory.Items.ConvertAll<IMenuOption>(x => new MenuItem(x.Name, _font, (a,b) => Handler(x))),
-                new Rectangle((int)(0.1 * _vW), (int)(0.1 * _vH), _vW - (int)(0.2 * _vW), _vH - (int)(0.2 * _vH)),
-                _font,
-                //Handler,
-                Orientation.Horizontal,
-                3
-            );
+            if (newList.Count > 0)
+            {
+                _list = new MenuList(
+                    _inventory.Items.ConvertAll<IMenuOption>(x => new MenuItem(x.Name, _font, (a,b) => Handler(x))),
+                    new Rectangle((int)(0.1 * _vW), (int)(0.1 * _vH), _vW - (int)(0.2 * _vW), _vH - (int)(0.2 * _vH)),
+                    _font,
+                    //Handler,
+                    Orientation.Horizontal,
+                    3
+                );
+            } else
+            {
+                _list = null;
+                _stack.Push(new TestComponent(new Rectangle(0, 0, 100, 100), "none", _font));
+            }
         }
 
         public void Handler(Item item)
@@ -167,7 +176,34 @@ namespace FFClone.States
                 ItemPortraitGroup ipg = (ItemPortraitGroup)mo;
                 Debug.WriteLine($"Giving {item.Name} to {ipg.ItemPortrait.Hero.Name}");
                 ipg.ItemPortrait.Hero.GiveItem(item);
-                _modal.Label = $"{item.Quantity} Left\ngive to who";
+                if (!_inventory.Remove(item))
+                {
+                    _stack.Pop();
+
+                    List<IMenuOption> newList = _inventory.Items.ConvertAll<IMenuOption>(x => new MenuItem(x.Name, _font, (a, b) => Handler(x)));
+                    if (newList.Count > 0)
+                    {
+                        _list.Refresh(newList);
+                    } else
+                    {
+                        _stack.Clear();
+                        _list = null;
+                        _stack.Push(new TestComponent(new Rectangle(0, 0, 100, 100), "none", _font));
+                    }
+                    //_list = new MenuList(
+                    //    _inventory.Items.ConvertAll<IMenuOption>(x => new MenuItem(x.Name, _font, (a, b) => Handler(x))),
+                    //    new Rectangle((int)(0.1 * _vW), (int)(0.1 * _vH), _vW - (int)(0.2 * _vW), _vH - (int)(0.2 * _vH)),
+                    //    _font,
+                    //    //Handler,
+                    //    Orientation.Horizontal,
+                    //    3
+                    //);
+
+                } else
+                {
+                    _modal.Label = $"{item.Quantity} Left\ngive to who";
+                }
+
             });
 
             _modal = new ConfirmationModal(
@@ -182,7 +218,10 @@ namespace FFClone.States
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             spriteBatch.Begin();
-            _list.Draw(gameTime, spriteBatch);
+            if (_list != null)
+            {
+                _list.Draw(gameTime, spriteBatch);
+            }
 
             if (_stack.Count > 0)
             {
@@ -209,7 +248,10 @@ namespace FFClone.States
             if (_stack.Count > 0)
                 _stack.Peek().Update(gameTime);
             else
+                if (_list != null)
+            {
                 _list.Update(gameTime);
+            }
 
             _previousKeyboard = ks;
         }

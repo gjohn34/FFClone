@@ -44,7 +44,7 @@ namespace FFClone.Models
     public class Hero : Character, IBattleable
     {
         public string Portrait { get; set; }
-        public Job Job { get; }
+        public Job Job { get; set; }
         public List<Spell> Spells { get; set; } = new List<Spell>();
         public List<Action> Options { get; set; }
         public int Experience { get; set; }
@@ -178,7 +178,6 @@ namespace FFClone.Models
 
         internal void GiveItem(Item item)
         {
-            item.Quantity -= 1;
             HP += item.Potency;
             if (HP > MaxHP)
             {

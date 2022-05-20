@@ -139,15 +139,6 @@ namespace FFClone.Controls
             {
                 option.Rectangle = GeneratePosition(MenuItems.IndexOf(option), MenuItems.Count);
             }
-            //{
-            //    MenuItems.Add(new MenuItem(
-            //        menuItems[i].Label,
-            //        GeneratePosition(i, menuItems.Count),
-            //        spriteFont,
-            //        Color.Gray,
-            //        menuItems[i].OnSubmit
-            //    ));
-            //}
             MenuItems[Selected].Selected = true;
 
         }
@@ -170,6 +161,25 @@ namespace FFClone.Controls
 
             }
         }
+
+        internal void Refresh(List<IMenuOption> menuItems)
+        {
+
+            MenuItems = menuItems;
+            foreach (IMenuOption option in MenuItems)
+            {
+                option.Rectangle = GeneratePosition(MenuItems.IndexOf(option), MenuItems.Count);
+            }
+            if (Selected >= menuItems.Count)
+            {
+                Selected = menuItems.Count - 1;
+            }
+            if (Selected >= 0)
+            {
+                MenuItems[Selected].Selected = true;
+            }
+        }
+
         private Rectangle GeneratePosition(int index, int length)
         {
             int spaceBetweenY, spaceBetweenX, cellHeight, cellWidth, initialYPos, initialXPos, pushDown, pushDown2;

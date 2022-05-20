@@ -174,7 +174,6 @@ namespace FFClone.States.Battle.BattleViews
         private Scene _scene = Scene.Idle;
         private int _remainingExp = 0;
         private int _expGain = 0;
-        private List<string> _rewards = new List<string>();
         private List<LevelUp> _levelUps = new List<LevelUp>();
         private List<PartyRow> _partyRows = new List<PartyRow>();
         private List<Dictionary<string, string>> _oldStats = new List<Dictionary<string, string>>();
@@ -203,7 +202,6 @@ namespace FFClone.States.Battle.BattleViews
             foreach (Enemy enemy in _enemies)
             {
                 _expGain += enemy.ExperienceGain;
-                _rewards.Add(enemy.Reward);
             }
             _remainingExp = _expGain;
         }
@@ -214,11 +212,6 @@ namespace FFClone.States.Battle.BattleViews
             spriteBatch.DrawString(_font, "Victory", new Vector2(_vW - _font.MeasureString("Victory").X, yOffset), Color.Black);
             yOffset += _font.LineSpacing;
 
-            foreach (string reward in _rewards)
-            {
-                spriteBatch.DrawString(_font, $"Monster dropped: {reward}", new Vector2(_vW - _font.MeasureString($"Monster dropped: {reward}").X, yOffset), Color.Black);
-                yOffset += _font.LineSpacing;
-            }
             _levelUps.ForEach(x => x.Draw(gameTime, spriteBatch));
             if (_modal != null)
             {
@@ -244,7 +237,13 @@ namespace FFClone.States.Battle.BattleViews
                         break;
                     case State.Gained:
                         string rewards = "";
-                        _enemies.ForEach(e => rewards += $"{e.Reward}\n");
+                        Inventory items = new Inventory();
+                        _enemies.ForEach(e =>
+                        {
+                            rewards += $"{e.Reward.Name}\n";
+                            items.Add(e.Reward);
+                        });
+                        GameInfo.Instance.Inventory.Merge(items);
 
                         _modal = new Modal(
                             _font,
