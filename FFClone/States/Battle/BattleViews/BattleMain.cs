@@ -305,10 +305,10 @@ namespace FFClone.States.Battle.BattleViews
         }
         public void SetHeroSprites()
         {
-            double yOffset = 0.1;
+            double yOffset = 0.2;
             _party.ForEach(hero => {
                 hero.BattleSprite.Position = new Vector2((int)(_vW - (_vW * 0.20)), (int)(_vH * yOffset));
-                yOffset += 0.2;
+                yOffset += 0.15;
             });
 
             int current = _party.IndexOf((Hero)Current);
@@ -328,9 +328,9 @@ namespace FFClone.States.Battle.BattleViews
                 }
             });
 
-            int spritesPerColumn = (int)(0.7 * _vH) / (largestSpriteHeight);
+            int yOffset = (int)(0.2 * _vH);
+            int spritesPerColumn = (int)(0.7 * _vH - yOffset) / (largestSpriteHeight);
             int index = 0;
-            int yOffset = 0;
             int xOffset = 0;
             int spritesLeft = _enemies.Count;
             _enemies.ForEach(enemy =>
@@ -348,7 +348,7 @@ namespace FFClone.States.Battle.BattleViews
                 if (index >= spritesPerColumn)
                 {
                     xOffset += enemy.BattleSprite.Width;
-                    yOffset = 0;
+                    yOffset = (int)(0.2 * _vH);
                     index = 0;
                 }
                 else
