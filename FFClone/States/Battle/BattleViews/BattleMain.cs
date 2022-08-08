@@ -39,6 +39,7 @@ namespace FFClone.States.Battle.BattleViews
     }
     public class BattleMain : BattleView
     {
+
         public BattleScene BattleScene { get; set; } = BattleScene.Idle;
         // currentlyAnimating
         #region CurrentlyAnimating
@@ -75,6 +76,8 @@ namespace FFClone.States.Battle.BattleViews
 
         private int _thickness = 10;
         private BattleBars _battleBar;
+        private Texture2D _battleTexture;
+
 
         public BattleMain(Game1 game, GraphicsDevice graphicsDevice, ContentManager content, BattleModel battleModel) : base(game, graphicsDevice, content, battleModel)
         {
@@ -98,6 +101,7 @@ namespace FFClone.States.Battle.BattleViews
 
             Rectangle rectangle = new Rectangle(_thickness, _vH - (int)(_vH * 0.3), _vW - _thickness, (int)(_vH * 0.3) - _thickness);
             _battleBar = new BattleBars(game, graphicsDevice, content, _party, _enemies, this, rectangle);
+            _battleTexture = content.Load<Texture2D>("Sprites/Backgrounds/country_field");
 
             SetHeroSprites();
             SetEnemySprite();
@@ -223,6 +227,7 @@ namespace FFClone.States.Battle.BattleViews
         }
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
+            spriteBatch.Draw(_battleTexture, new Rectangle(0, 0, _vW, (int)(_vH * 0.7)), Color.White);
             // heroes
             _party.ForEach(hero => {
                 hero.BattleSprite.Draw(spriteBatch);

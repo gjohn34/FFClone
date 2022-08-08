@@ -56,11 +56,11 @@ namespace FFClone
             using (_isolatedFileStream = _dataFile.OpenFile("file.sav", FileMode.Open, FileAccess.ReadWrite))
             {
                 saveData = (SaveGame)serializer.Deserialize(_isolatedFileStream);
-                //saveData.Party = new List<Hero>(){
-                //    new Hero("John", Job.Warrior, Color.Red, "Sprites/ninja-idle", "Sprites/Portraits/1p"),
-                //    new Hero("Luke", Job.Mage, Color.Blue, "Sprites/ninja-idle", "Sprites/Portraits/2p"),
-                //    new Hero("Paul", Job.Thief, Color.Green, "Sprites/ninja-idle", "Sprites/Portraits/3p")
-                //};
+                saveData.Party = new List<Hero>(){
+                    new Hero("John", Job.Warrior, Color.Red, "Sprites/Idles/warrior-idle", "Sprites/Portraits/1p"),
+                    new Hero("Luke", Job.Mage, Color.Blue, "Sprites/Idles/mage-idle", "Sprites/Portraits/2p"),
+                    new Hero("Paul", Job.Thief, Color.Green, "Sprites/Idles/ninja-idle", "Sprites/Portraits/3p")
+                };
                 GameInfo.Instance.Initialize(saveData);
                 // Loop through nested Lists
                 _dataFile.Close();
@@ -74,10 +74,10 @@ namespace FFClone
         {
 
             GameInfo.Instance.Initialize(new SaveGame
-            {
+{
                 Party = new List<Hero>()
                 {
-                    new Hero("John", Job.Warrior, Color.Red, "Sprites/ninja-idle", "Sprites/Portraits/1p")
+                    new Hero("John", Job.Warrior, Color.Red, "Sprites/mage-idle", "Sprites/Portraits/1p")
                 },
                 EncounterInfo = new EncounterInfo(),
                 Inventory = new Inventory(new List<Item>()

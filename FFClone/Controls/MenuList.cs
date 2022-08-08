@@ -144,8 +144,8 @@ namespace FFClone.Controls
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.DrawRectangle(Rectangle, Color.White);
-            spriteBatch.DrawRectangleWithFill(Rectangle, 0, Color.Black, _orientation == Orientation.Vertical ? Color.White : Color.Black * _opacity);
+            spriteBatch.DrawRectangle(Rectangle, Color.Transparent);
+            spriteBatch.DrawRectangleWithFill(Rectangle, 0, Color.Black, _orientation == Orientation.Vertical ? Color.Transparent : Color.Black * _opacity);
             foreach (IMenuOption menuItem in MenuItems)
                 menuItem.Draw(gameTime, spriteBatch);
 

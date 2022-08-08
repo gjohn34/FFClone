@@ -8,8 +8,11 @@ namespace FFClone.States
     {
         public CreditsState(Game1 game, GraphicsDevice graphicsDevice, ContentManager content) : base(game, graphicsDevice, content)
         {
-        // https://opengameart.org/content/animated-character
-        //https://opengameart.org/content/dorver-monster
+            // https://opengameart.org/content/grid-background
+            // https://opengameart.org/content/animated-character
+            // https://opengameart.org/content/dorver-monster
+            // https://opengameart.org/content/country-field
+            // https://www.spriters-resource.com/psp/finalfantasy4thecompletecollectiontheafteryears/sheet/58218/
         }
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)

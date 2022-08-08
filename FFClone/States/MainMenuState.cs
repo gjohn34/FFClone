@@ -14,6 +14,7 @@ namespace FFClone.States
     public class MainMenuState : State
     {
         private MenuList _menuList;
+        private Texture2D _background;
 
         public MainMenuState(Game1 game, GraphicsDevice graphicsDevice, ContentManager content) : base(game, graphicsDevice, content)
         {
@@ -27,7 +28,9 @@ namespace FFClone.States
                     _stateManager.Next(new GameState(_game, _graphicsDevice, _content), Transition.NoTransition);
                 }),
                 new MenuOption("Help", (a, e) => { }),
-                new MenuOption("Credits", (a,e) => { })
+                new MenuOption("Credit To", (a,e) => {
+                    _stateManager.Next(new CreditsState(_game, _graphicsDevice, _content), Transition.NoTransition);
+                })
             };
 
             int width = (int)Math.Ceiling(_game.Window.ClientBounds.Width * 0.2);
@@ -47,6 +50,8 @@ namespace FFClone.States
                 _font
                 //HandleHandlers
             );
+
+            _background = content.Load<Texture2D>("Sprites/Backgrounds/grid_bg");
             //foreach (MenuItem item in _menuList.MenuItems)
             //{
             //    item.Touch += HandleHandlers(item.Text); 
@@ -56,6 +61,7 @@ namespace FFClone.States
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             spriteBatch.Begin();
+            spriteBatch.Draw(_background, new Rectangle(0, 0, _vW, _vH), Color.White);
             _menuList.Draw(gameTime, spriteBatch);
             spriteBatch.End();
         }
@@ -75,7 +81,7 @@ namespace FFClone.States
                 ,
                 "Help" => (a, e) => { }
                 ,
-                "Credit" => (a, e) => { }
+                "Credit To" => (a, e) => { }
                 ,
                 //StateManager.Instance.Next(new NewGameState());
                 _ => (a, e) => { }
