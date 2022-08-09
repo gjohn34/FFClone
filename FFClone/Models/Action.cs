@@ -5,7 +5,7 @@ namespace FFClone.Models
     [Serializable]
     public class Action
     {
-        public string Name { get; }
+        public string Name { get; set; }
         public int BaseDamage { get; set; } = 1;
         public Action(string name)
         {
