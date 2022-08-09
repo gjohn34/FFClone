@@ -16,6 +16,13 @@ namespace FFClone.States.Battle.BattleViews
     {
         private bool _growing = true;
         private SpriteFont _font;
+        public Hero Hero
+        {
+            get
+            {
+                return _hero;
+            }
+        }
         private Hero _hero;
         private List<int> _centerPoints;
         private Stopwatch _stopwatch = new Stopwatch();
@@ -166,6 +173,7 @@ namespace FFClone.States.Battle.BattleViews
         {
             Gaining,
             Gained,
+            Levelled,
             Rewards,
             Done,
         }
@@ -211,8 +219,7 @@ namespace FFClone.States.Battle.BattleViews
             int yOffset = 0;
             spriteBatch.DrawString(_font, "Victory", new Vector2(_vW - _font.MeasureString("Victory").X, yOffset), Color.Black);
             yOffset += _font.LineSpacing;
-
-            _levelUps.ForEach(x => x.Draw(gameTime, spriteBatch));
+            if (_state == State.Gained) _levelUps.ForEach(x => x.Draw(gameTime, spriteBatch));
             if (_modal != null)
             {
                 _modal.Draw(gameTime, spriteBatch);
@@ -279,6 +286,9 @@ namespace FFClone.States.Battle.BattleViews
                     if (_state == State.Gaining)
                     {
                         _scene = Scene.AnimatingStart;
+                    } else if (_state == State.Gained)
+                    {
+                        _levelUps.ForEach(x => x.Update(gameTime));
                     }
                     break;
                 case Scene.AnimatingStart:
@@ -293,25 +303,37 @@ namespace FFClone.States.Battle.BattleViews
                     break;
                 case Scene.Animating:
                     _party.ForEach(hero => {
-                        if (hero.IncreaseExperience(1))
-                        {
-                            Rectangle x = _partyRows.Find(x => x.Hero == hero).Rectangle;
-                            Rectangle r = new Rectangle(
-                                        (int)(0.4f * x.Width),
-                                        x.Y,
-                                        (int)(0.4f * _vW),
-                                        x.Height
-                                    );
+                    if (hero.IncreaseExperience(1))
+                    {
+                        Rectangle x = _partyRows.Find(x => x.Hero == hero).Rectangle;
+                        Rectangle r = new Rectangle(
+                                    (int)(0.4f * x.Width),
+                                    x.Y,
+                                    (int)(0.4f * _vW),
+                                    x.Height
+                                );
 
-
-                            _levelUps.Add(
+                        int index = _levelUps.FindIndex(x => x.Hero == hero);
+                            if (index < 0)
+                            {
+                                _levelUps.Add(
+                                    new LevelUp(
+                                        hero,
+                                        _oldStats[_party.IndexOf(hero)],
+                                        r,
+                                        _font
+                                    )
+                                );
+                            } else
+                            {
+                                _levelUps[index] =
                                 new LevelUp(
                                     hero,
                                     _oldStats[_party.IndexOf(hero)],
                                     r,
                                     _font
-                                )
-                            );
+                                );
+                            }
                         };
                     });
                     _remainingExp -= 1;
@@ -329,7 +351,6 @@ namespace FFClone.States.Battle.BattleViews
                 default:
                     break;
             }
-            _levelUps.ForEach(x => x.Update(gameTime));
         }
     }
 }
