@@ -30,6 +30,7 @@ namespace FFClone.States
                     new MenuItem("Party", _font, (object a, EventArgs e) => _stateManager.Next(new PartyMenuState(_game, _graphicsDevice, _content), Transition.NoTransition)),
                     new MenuItem("Items",  _font,(object a, EventArgs e) => _stateManager.Next(new ItemMenuState(_game, _graphicsDevice, _content), Transition.NoTransition)),
                     new MenuItem("Config", _font,(a, e) => { }),
+                    new MenuItem("Main Menu", _font,(a, e) => { _stateManager.Next(new MainMenuState(_game, _graphicsDevice, _content), Transition.NoTransition); }),
                     new MenuItem("Save",  _font,(object a, EventArgs e) => {
                         string label = "Overwrite existing save data?";
                         List<IMenuOption> list = new List<IMenuOption>
@@ -78,7 +79,7 @@ namespace FFClone.States
         {
             _encounterInfo = GameInfo.Instance.EncounterInfo;
             _background = content.Load<Texture2D>("Sprites/background");
-            _mapRectangle = new Rectangle(0, 0, _background.Width, _background.Height);
+            _mapRectangle = new Rectangle((int)_encounterInfo.MapPosition.X, (int)_encounterInfo.MapPosition.Y, _background.Width, _background.Height);
             Texture2D pSprite = content.Load<Texture2D>("Sprites/guy");
             // TODO - NEED A BETTER WAY THAN THIS
             if (_encounterInfo.Position.Equals(Vector2.Zero))
@@ -210,13 +211,19 @@ namespace FFClone.States
             {
                 _mapRectangle = new Rectangle(_mapRectangle.X - (int)velocity.X, _mapRectangle.Y - (int)velocity.Y, _mapRectangle.Width, _mapRectangle.Height);
             }
+            
+            if (velocity != Vector2.Zero)
+            {
+                _encounterInfo.MapPosition = new Vector2(_mapRectangle.X, _mapRectangle.Y);
+            }
+
             if (generateEnc)
             {
                 _encounterInfo.Ticks += 0.02;
 
                 _encounterInfo.Chance = _rand.NextDouble() + _encounterInfo.Ticks;
                 speed = 1;
-                if (_encounterInfo.Chance > speed)
+                if (_encounterInfo.Chance > speed + 2)
                 {
                     _encounterInfo.Ticks = 0;
                     StateManager.Instance.Next(new BattleState(_game, _graphicsDevice, _content, this), Transition.NoTransition);

@@ -44,30 +44,53 @@ namespace FFClone
         private static IsolatedStorageFileStream _isolatedFileStream;
         private static IsolatedStorageFile _dataFile;
 
-        public static SaveGame Load()
+        public static void Load()
         {
             _dataFile = IsolatedStorageFile.GetUserStoreForDomain();
             XmlSerializer serializer = new XmlSerializer(typeof(SaveGame));
             SaveGame saveData = new SaveGame();
             if (!_dataFile.FileExists("file.sav"))
             {
-                Debug.WriteLine("File not found - start new game");
+                Debug.WriteLine("File not found - starting new game");
+                New();
+                return;
             }
             using (_isolatedFileStream = _dataFile.OpenFile("file.sav", FileMode.Open, FileAccess.ReadWrite))
             {
                 saveData = (SaveGame)serializer.Deserialize(_isolatedFileStream);
-                saveData.Party = new List<Hero>(){
-                    new Hero("John", Job.Warrior, Color.Red, "Sprites/Idles/warrior-idle", "Sprites/Portraits/1p"),
-                    new Hero("Luke", Job.Mage, Color.Blue, "Sprites/Idles/mage-idle", "Sprites/Portraits/2p"),
-                    new Hero("Paul", Job.Thief, Color.Green, "Sprites/Idles/ninja-idle", "Sprites/Portraits/3p")
-                };
                 GameInfo.Instance.Initialize(saveData);
                 // Loop through nested Lists
                 _dataFile.Close();
                 _isolatedFileStream.Close();
             }
             //new Hero("John", Job.Warrior, Color.Red, "Sprites/ninja-idle", "Sprites/Portraits/1p")
-            return saveData;
+        }
+
+        public static void Destroy()
+        {
+            _dataFile = IsolatedStorageFile.GetUserStoreForDomain();
+            _dataFile.DeleteFile("file.sav");
+        }
+
+        public static void LoadDummy()
+        {
+            GameInfo.Instance.Initialize(new SaveGame
+            {
+                Party = new List<Hero>()
+                {
+                    new Hero("John", Job.Warrior, Color.Red, "Sprites/Idles/warrior-idle", "Sprites/Portraits/1p"),
+                    new Hero("Luke", Job.Mage, Color.Blue, "Sprites/Idles/mage-idle", "Sprites/Portraits/2p"),
+                    new Hero("Paul", Job.Thief, Color.Purple, "Sprites/Idles/thief-idle", "Sprites/Portraits/3p")
+                },
+                EncounterInfo = new EncounterInfo(),
+                Inventory = new Inventory(new List<Item>()
+                {
+                    new Item(1, "Potion", 3),
+                    new Item(2, "Hi-Potion", 3),
+                    new Item(4, "Phoenix Down", 3)
+                })
+            }); 
+
         }
 
         internal static void New()
@@ -77,7 +100,7 @@ namespace FFClone
 {
                 Party = new List<Hero>()
                 {
-                    new Hero("John", Job.Warrior, Color.Red, "Sprites/mage-idle", "Sprites/Portraits/1p")
+                    new Hero("John", Job.Warrior, Color.Red, "Sprites/Idles/warrior-idle", "Sprites/Portraits/1p")
                 },
                 EncounterInfo = new EncounterInfo(),
                 Inventory = new Inventory(new List<Item>()

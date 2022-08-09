@@ -5,6 +5,7 @@ using FFClone.States.Battle.BattleViews;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 
 namespace FFClone.States
@@ -36,16 +37,18 @@ namespace FFClone.States
                     "DEX", 10
                 },
                 {
-                    "EXP", 10
+                    "EXP", 2
                 }
             };
 
-            List<Enemy> enemies = new List<Enemy> {
-                new Enemy("Purple Guy 1", Color.Purple, statBlock),
-                new Enemy("Purple Guy 2", Color.Purple, statBlock),
-                //new Enemy("Purple Guy 3", Color.Purple, statBlock),
-                new Enemy("Purple Guy 4", Color.Purple, statBlock)
-            };
+            int rand = new Random().Next(1, 5);
+            List<Enemy> enemies = new List<Enemy>();
+
+
+            for (int x = 0; x < rand; x++)
+            {
+                enemies.Add(new Enemy($"Monster {x + 1}", Color.Purple, statBlock));
+            }
 
             _battleModel = new BattleModel(GameInfo.Instance.Party, enemies);
             _battleViewManager = BattleViewManager.Instance;

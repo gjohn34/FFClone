@@ -27,6 +27,11 @@ namespace FFClone.States
                     SaveFile.Load();
                     _stateManager.Next(new GameState(_game, _graphicsDevice, _content), Transition.NoTransition);
                 }),
+                new MenuOption("Dummy Party", (a, e) => {
+                    SaveFile.LoadDummy();
+                    _stateManager.Next(new GameState(_game, _graphicsDevice, _content), Transition.NoTransition);
+                    }),
+                new MenuOption("Delete Save", (a, e) => { SaveFile.Destroy(); }),
                 new MenuOption("Help", (a, e) => { }),
                 new MenuOption("Credit To", (a,e) => {
                     _stateManager.Next(new CreditsState(_game, _graphicsDevice, _content), Transition.NoTransition);
@@ -64,29 +69,6 @@ namespace FFClone.States
             spriteBatch.Draw(_background, new Rectangle(0, 0, _vW, _vH), Color.White);
             _menuList.Draw(gameTime, spriteBatch);
             spriteBatch.End();
-        }
-
-        public EventHandler HandleHandlers(string option)
-        {
-            return option switch
-            {
-                "New" => (object a, EventArgs e) => {
-                    SaveFile.New();
-                    _stateManager.Next(new GameState(_game, _graphicsDevice, _content), Transition.NoTransition);
-                    },
-                "Load" => (a, e) => {
-                    SaveFile.Load();
-                    _stateManager.Next(new GameState(_game, _graphicsDevice, _content), Transition.NoTransition);
-                }
-                ,
-                "Help" => (a, e) => { }
-                ,
-                "Credit To" => (a, e) => { }
-                ,
-                //StateManager.Instance.Next(new NewGameState());
-                _ => (a, e) => { }
-                ,
-            };
         }
 
         public override void Update(GameTime gameTime)

@@ -273,6 +273,7 @@ namespace FFClone.States.Battle.BattleViews
                         _modal.Call();
                         break;
                     case State.Done:
+                        GameInfo.Instance.EncounterInfo.Reset();
                         _stateManager.Done();
                         break;
                     default:
