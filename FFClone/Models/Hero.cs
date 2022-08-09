@@ -48,7 +48,7 @@ namespace FFClone.Models
         public List<Spell> Spells { get; set; } = new List<Spell>();
         public List<Action> Options { get; set; }
         public int Experience { get; set; }
-        public int ToNextLevel { get; set; } = 9;
+        public int ToNextLevel { get; set; }
         internal Dictionary<string, string> OldStats
         {
             get
@@ -146,14 +146,14 @@ namespace FFClone.Models
                     Dexterity = 2;
                     Intelligence = 1;
                     MaxHP = 20;
-                    HP = 10;
+                    HP = 20;
                     break;
                 case Job.Mage:
                     Strength = 1;
                     Dexterity = 1;
                     Intelligence = 5;
                     MaxHP = 10;
-                    HP = 8;
+                    HP = 10;
                     break;
                 case Job.Thief:
                     Strength = 2;
@@ -163,8 +163,11 @@ namespace FFClone.Models
                     HP = 15;
                     break;
                 default:
+
                     throw new Exception();
             }
+            ToNextLevel = Level * 9;
+
         }
         public BattleSprite BattleSprite { get; set ; }
         public Vector2 HomePosition { get; set; }

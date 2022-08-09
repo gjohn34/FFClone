@@ -12,5 +12,11 @@ namespace FFClone.Models
         public double Chance = 0;
         public Vector2 Position { get; set; } 
         public EncounterInfo() { }
+
+        internal void Reset()
+        {
+            Ticks = 0;
+            Chance = 0;
+        }
     }
 }

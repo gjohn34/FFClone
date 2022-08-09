@@ -10,7 +10,7 @@ namespace FFClone.Models
     {
         public Job Class { get; set; }
         public string Name { get; set; }
-        public int Level { get; set; }
+        public int Level { get; set; } = 1;
         public int HP { get; set; }
         public int MaxHP { get; set; }
         public int Strength { get; set; }
