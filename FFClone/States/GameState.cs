@@ -78,7 +78,7 @@ namespace FFClone.States
         public GameState(Game1 game, GraphicsDevice graphicsDevice, ContentManager content) : base(game, graphicsDevice, content)
         {
             _encounterInfo = GameInfo.Instance.EncounterInfo;
-            _background = content.Load<Texture2D>("Sprites/background");
+            _background = content.Load<Texture2D>("Sprites/Backgrounds/game-background");
             _mapRectangle = new Rectangle((int)_encounterInfo.MapPosition.X, (int)_encounterInfo.MapPosition.Y, _background.Width, _background.Height);
             Texture2D pSprite = content.Load<Texture2D>("Sprites/guy");
             // TODO - NEED A BETTER WAY THAN THIS

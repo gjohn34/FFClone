@@ -80,7 +80,7 @@ namespace FFClone
                 {
                     new Hero("John", Job.Warrior, Color.Red, "Sprites/Idles/warrior-idle", "Sprites/Portraits/1p"),
                     new Hero("Luke", Job.Mage, Color.Blue, "Sprites/Idles/mage-idle", "Sprites/Portraits/2p"),
-                    new Hero("Paul", Job.Thief, Color.Purple, "Sprites/Idles/thief-idle", "Sprites/Portraits/3p")
+                    new Hero("Paul", Job.Thief, Color.Purple, "Sprites/Idles/ninja-idle", "Sprites/Portraits/3p")
                 },
                 EncounterInfo = new EncounterInfo(),
                 Inventory = new Inventory(new List<Item>()

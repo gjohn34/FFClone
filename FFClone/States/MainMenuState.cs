@@ -56,7 +56,7 @@ namespace FFClone.States
                 //HandleHandlers
             );
 
-            _background = content.Load<Texture2D>("Sprites/Backgrounds/grid_bg");
+            _background = content.Load<Texture2D>("Sprites/Backgrounds/main-menu");
             //foreach (MenuItem item in _menuList.MenuItems)
             //{
             //    item.Touch += HandleHandlers(item.Text); 

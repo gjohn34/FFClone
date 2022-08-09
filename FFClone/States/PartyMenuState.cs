@@ -1,4 +1,5 @@
-﻿using FFClone.Helpers.Shapes;
+﻿using FFClone.Controls;
+using FFClone.Helpers.Shapes;
 using FFClone.Models;
 using FFClone.Transitions;
 using Microsoft.Xna.Framework;
@@ -16,66 +17,40 @@ namespace FFClone.States
     {
         private GameInfo _gameInfo = GameInfo.Instance;
         private List<Hero> _party;
-        private State _sender;
-        private List<Texture2D> _portraits = new List<Texture2D>();
+        private List<PartyRow> _partyRows = new List<PartyRow>();
+        private Texture2D _background;
+
 
         public PartyMenuState(Game1 game, GraphicsDevice graphicsDevice, ContentManager content) : base(game, graphicsDevice, content)
         {
+            _background = content.Load<Texture2D>("Sprites/Backgrounds/party-screen");
             _party = _gameInfo.Party;
-            _party.ForEach(hero => _portraits.Add(content.Load<Texture2D>(hero.Portrait)));
+            int spaceBetweenY = _vH / _party.Count;
 
+            if (spaceBetweenY > (int)(0.25f * _vH))
+            {
+                spaceBetweenY = (int)(0.33f * _vH);
+            }
+            int cellHeight = (int)Math.Ceiling((0.75 * spaceBetweenY));
+            _party.ForEach(hero =>
+            {
+                int index = _party.IndexOf(hero);
+                int initialYPos = index * spaceBetweenY;
+                double cellPositionPercentage = (double)index / (double)(_party.Count - 1);
+                int pushDown = (int)(cellPositionPercentage * cellHeight);
+                int pushDown2 = (int)(cellPositionPercentage * spaceBetweenY);
+                int yPosition = initialYPos - pushDown + pushDown2;
+                Texture2D portrait = content.Load<Texture2D>(hero.Portrait);
+                _partyRows.Add(new PartyRow(portrait, _font, hero, new Rectangle(0, yPosition, _vW, cellHeight), true));
+            });
         }
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             spriteBatch.Begin();
-            int spaceBetweenY = _vH / _portraits.Count;
-            if (spaceBetweenY > (int)(0.25f * _vH))
-            {
-                spaceBetweenY = (int)(0.33f * _vH);
-            }
-            int xMargin = 10;
-            int cellHeight = (int)Math.Ceiling((0.75 * spaceBetweenY));
-
-            _portraits.ForEach(portrait =>
-            {
-                int index = _portraits.IndexOf(portrait);
-                int initialYPos = index * spaceBetweenY;
-                double cellPositionPercentage = (double)index / (double)(_portraits.Count - 1);
-                int pushDown = (int)(cellPositionPercentage * cellHeight);
-                int pushDown2 = (int)(cellPositionPercentage * spaceBetweenY);
-                int yPosition = initialYPos - pushDown + pushDown2;
-                Rectangle rect = new Rectangle(0, yPosition, cellHeight, cellHeight);
-                spriteBatch.Draw(portrait, rect, Color.White);
-                Hero hero = _party[index];
-                spriteBatch.DrawString(_font, hero.Name, new Vector2(cellHeight + xMargin, yPosition), Color.Black);
-                yPosition += _font.LineSpacing;
-                // hp
-                spriteBatch.ProgressBar(_font, "HP", hero.HP, hero.MaxHP, Color.Green, Color.Red, new Rectangle(cellHeight + xMargin, yPosition, 100, 20));
-                yPosition += _font.LineSpacing + 20 + 5;
-                // xp
-                spriteBatch.ProgressBar(_font, "XP", hero.Experience, hero.ToNextLevel, Color.Blue, Color.White, new Rectangle(cellHeight + xMargin, yPosition, 100, 20));
-
-                // statblock
-                yPosition = initialYPos - pushDown + pushDown2;
-
-                int leftMargin = cellHeight + xMargin + 200;
-                int availableSpace = _vW - leftMargin;
-                int foo = availableSpace / 3;
-                spriteBatch.DrawString(_font, "Stat Block", new Vector2(cellHeight + xMargin + 200, yPosition), Color.Black);
-                yPosition += _font.LineSpacing + 5;
-
-                spriteBatch.DrawString(_font, "STR", new Vector2(leftMargin, yPosition), Color.Black);
-                spriteBatch.DrawString(_font, "INT", new Vector2(leftMargin + foo, yPosition), Color.Black);
-                spriteBatch.DrawString(_font, "DEX", new Vector2(leftMargin + foo + foo, yPosition), Color.Black);
-                yPosition += _font.LineSpacing + 5;
-
-
-                spriteBatch.DrawString(_font, hero.Strength.ToString(), new Vector2(leftMargin, yPosition), Color.Black);
-                spriteBatch.DrawString(_font, hero.Intelligence.ToString(), new Vector2(leftMargin + foo, yPosition), Color.Black);
-                spriteBatch.DrawString(_font, hero.Dexterity.ToString(), new Vector2(leftMargin + foo + foo, yPosition), Color.Black);
-
-            });
+            spriteBatch.Draw(_background, new Rectangle(0, 0, _vW, _vH), Color.White);
+            _partyRows.ForEach(x => x.Draw(gameTime, spriteBatch));
+            
             spriteBatch.End();
         }
 

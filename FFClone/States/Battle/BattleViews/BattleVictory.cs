@@ -185,8 +185,10 @@ namespace FFClone.States.Battle.BattleViews
         private List<LevelUp> _levelUps = new List<LevelUp>();
         private List<PartyRow> _partyRows = new List<PartyRow>();
         private List<Dictionary<string, string>> _oldStats = new List<Dictionary<string, string>>();
+        private Texture2D _background;
         public BattleVictory(Game1 game, GraphicsDevice graphicsDevice, ContentManager content, BattleModel battleModel) : base(game, graphicsDevice, content, battleModel)
         {
+            _background = content.Load<Texture2D>("Sprites/Backgrounds/party-screen");
             _state = State.Gaining;
             int spaceBetweenY = _vH / _party.Count;
 
@@ -215,6 +217,7 @@ namespace FFClone.States.Battle.BattleViews
         }
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
+            spriteBatch.Draw(_background, new Rectangle(0, 0, _vW, _vH), Color.White);
             _partyRows.ForEach(x => x.Draw(gameTime, spriteBatch));
             int yOffset = 0;
             spriteBatch.DrawString(_font, "Victory", new Vector2(_vW - _font.MeasureString("Victory").X, yOffset), Color.Black);
