@@ -4,8 +4,10 @@ using FFClone.Transitions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using MonoGame;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
@@ -15,6 +17,8 @@ namespace FFClone.States
     {
         private MenuList _menuList;
         private Texture2D _background;
+        private Stack<IComponent> _stack = new Stack<IComponent>();
+
 
         public MainMenuState(Game1 game, GraphicsDevice graphicsDevice, ContentManager content) : base(game, graphicsDevice, content)
         {
@@ -24,8 +28,42 @@ namespace FFClone.States
                     _stateManager.Next(new GameState(_game, _graphicsDevice, _content), Transition.NoTransition);
                     }),
                 new MenuOption("Load", (a, e) => {
-                    SaveFile.Load();
-                    _stateManager.Next(new GameState(_game, _graphicsDevice, _content), Transition.NoTransition);
+                    try
+                    {
+                        SaveFile.Load();
+                        _stateManager.Next(new GameState(_game, _graphicsDevice, _content), Transition.NoTransition);
+                    } catch {
+                        string label = "No save data found. Start new game?";
+                        List<IMenuOption> list = new List<IMenuOption>
+                        {
+                            new MenuItem("yes", _font, (a,b) => {
+                                SaveFile.New();
+                                _stateManager.Next(new GameState(_game, _graphicsDevice, _content), Transition.NoTransition);
+                                _stack.Pop();
+                                }),
+                            new MenuItem("no",_font, (a,b) =>
+                                {
+                                    _stack.Pop();
+                                })
+                        };
+
+                        Rectangle r = new Rectangle((int)(0.3f * _vW), (int)(0.3f * _vH), (int)(0.3f * _vW), (int)(0.3f * _vH));
+
+                        Rectangle y = new Rectangle(
+                            r.X,
+                            r.Y + (int)(_font.MeasureString(label).Y),
+                            r.Width,
+                            (int)(r.Height - _font.MeasureString(label).Y)
+                        );
+
+                        MenuList menulist = new MenuList(list, y, _font, Orientation.Horizontal, list.Count);
+                        _stack.Push(new ConfirmationModal(
+                            _font,
+                            label,
+                            menulist,
+                            _game.Window.ClientBounds
+                        ));
+                    }
                 }),
                 new MenuOption("Dummy Party", (a, e) => {
                     SaveFile.LoadDummy();
@@ -68,11 +106,28 @@ namespace FFClone.States
             spriteBatch.Begin();
             spriteBatch.Draw(_background, new Rectangle(0, 0, _vW, _vH), Color.White);
             _menuList.Draw(gameTime, spriteBatch);
+            if (_stack.Count > 0)
+            {
+                _stack.Peek().Draw(gameTime, spriteBatch);
+            }
             spriteBatch.End();
         }
 
         public override void Update(GameTime gameTime)
         {
+            KeyboardState keyboardState = Keyboard.GetState();
+            if (_stack.Count > 0)
+            {
+                _stack.Peek().Update(gameTime);
+                if (keyboardState.IsKeyDown(Keys.Escape) && _previousKeyboard.IsKeyUp(Keys.Escape))
+                {
+                    _stack.Pop();
+                    _previousKeyboard = keyboardState;
+                    return;
+                }
+                _previousKeyboard = keyboardState;
+                return;
+            }
             _menuList.Update(gameTime);
         }
 

@@ -51,9 +51,7 @@ namespace FFClone
             SaveGame saveData = new SaveGame();
             if (!_dataFile.FileExists("file.sav"))
             {
-                Debug.WriteLine("File not found - starting new game");
-                New();
-                return;
+                new Exception();
             }
             using (_isolatedFileStream = _dataFile.OpenFile("file.sav", FileMode.Open, FileAccess.ReadWrite))
             {
