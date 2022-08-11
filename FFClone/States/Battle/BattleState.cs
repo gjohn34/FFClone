@@ -52,7 +52,6 @@ namespace FFClone.States
 
             _battleModel = new BattleModel(GameInfo.Instance.Party, enemies);
             _battleViewManager = BattleViewManager.Instance;
-            //_battleViewManager = new BattleViewManager(new BattleVictory(game, graphicsDevice, content, _battleModel), gameState);
             _battleViewManager.New(new BattleMain(game, graphicsDevice, content, _battleModel), gameState);
 
         }
@@ -61,18 +60,11 @@ namespace FFClone.States
         {
             spriteBatch.Begin();
             _battleViewManager.Draw(gameTime, spriteBatch);
-            //int width = _vW / 2 - (int)(_font.MeasureString("battlemode").X / 2);
-            //spriteBatch.DrawString(_font, "battlemode", new Vector2(width, 0), Color.White);
-            //_battle.Draw(gameTime, spriteBatch);
             spriteBatch.End();
         }
 
         public override void Update(GameTime gameTime)
         {
-            //if (_battleModel.BattleOver)
-            //{
-            //    _battleViewManager.Next(new BattleVictory(_game, _graphicsDevice, _content, _battleModel));
-            //}
             _battleViewManager.Update(gameTime);
         }
 

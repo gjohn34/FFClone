@@ -52,11 +52,9 @@ namespace FFClone.Controls
 
             _commandMenu = new MenuList(
                 options,
-                //_battle.Current.Options,
                 new Rectangle(rectangle.X, menuYPos, commandWidth - rectangle.X, rectangle.Height - rectangle.X - 1), 
                 _font 
             );
-            //_menuStack.Push(commandMenu);
         }
 
         public void Update(GameTime gameTime)
@@ -102,7 +100,6 @@ namespace FFClone.Controls
 
                 spriteBatch.DrawString(_font, hero.Name, v, Color.Black);
                 spriteBatch.ProgressBar(_font, "HP", hero.HP, hero.MaxHP, Color.Green, Color.Red, new Rectangle(xOffset, menuYPos + (int)_font.LineSpacing, 100, 20));
-                //spriteBatch.DrawString(_font, $"{hero.HP} / {hero.MaxHP}", new Vector2(xOffset, menuYPos + (int)_font.LineSpacing), Color.White);
 
                 // offset by 2 for box and border pixels
                 xOffset += charInfoWidth + 1;
@@ -153,11 +150,6 @@ namespace FFClone.Controls
                         })),
                         new Rectangle(0,0, _vW, _vH - _commandMenu.Rectangle.Height - (2 * _commandMenu.Rectangle.X)),
                         _font,
-                        //(string x) => { return (a, b) => {
-                        //    _menuStack.Pop();
-                        //    _battle.EnablePrompt(GetVectors(), new Spell(x)); 
-                        //    }; 
-                        //},
                         Orientation.Horizontal,
                         3,
                         0.5f

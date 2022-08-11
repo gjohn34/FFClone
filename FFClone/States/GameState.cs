@@ -23,8 +23,7 @@ namespace FFClone.States
         private KeyboardState _previousKeyboardState;
         private EncounterInfo _encounterInfo;
         private Random _rand = new Random();
-        private decimal _foo = 0;
-        internal MenuList menuList { 
+        internal MenuList MenuList { 
             get
             {
                 List<IMenuOption> options = new List<IMenuOption>
@@ -144,7 +143,7 @@ namespace FFClone.States
             bool generateEnc = false;
             if (keyboardState.IsKeyUp(Keys.Enter) && _previousKeyboardState.IsKeyDown(Keys.Enter))
             {
-                _stack.Push(menuList);
+                _stack.Push(MenuList);
                 // open up menu
             }
             if (keyboardState.IsKeyDown(Keys.Up))

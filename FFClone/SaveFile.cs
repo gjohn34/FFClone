@@ -21,8 +21,6 @@ namespace FFClone
     {
         private static SaveFile instance = null;
         private static readonly object padlock = new object();
-        private static SaveGame _saveData;
-
         SaveFile()
         {
         }

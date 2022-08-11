@@ -58,8 +58,6 @@ namespace FFClone.States
         public Prompt(List<IBattleable> options, BattleMain battle, Action action)
         {
             _previous = Keyboard.GetState();
-            //Vectors = vectors;
-            //Options = options.ConvertAll<Vector2>(x => new Vector2(x.BattleSprite.Position.X, x.BattleSprite.Position.Y + (int)(0.5 * x.BattleSprite.Height));
             Options = options;
             _promptOn = options[0];
             _selector = new Triangle(new Vector2(_promptOn.BattleSprite.Position.X, _promptOn.BattleSprite.Position.Y + (int)(0.5 * _promptOn.BattleSprite.Height)), new Point(35, 12));
@@ -74,7 +72,6 @@ namespace FFClone.States
 
             if (keyboard.Released(_previous, Keys.Enter))
             {
-                //OnConfirm.Invoke(_battle, new EventArgs());
                 _battle.SetSelected(_promptOn, _action);
             } else if (keyboard.Released(_previous, Keys.Escape))
             {
@@ -119,8 +116,6 @@ namespace FFClone.States
         public void Resized()
         {
             _selector = new Triangle(new Vector2(_promptOn.BattleSprite.Position.X, _promptOn.BattleSprite.Position.Y + (int)(0.5 * _promptOn.BattleSprite.Height)), new Point(35, 12));
-
-            //throw new NotImplementedException();
         }
     }
 }

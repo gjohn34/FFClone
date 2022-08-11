@@ -64,7 +64,6 @@ namespace FFClone.Controls
                 spriteBatch.DrawString(_font, _hero.Dexterity.ToString(), new Vector2(leftMargin + buffer + buffer, yPosition), Color.Black);
 
             }
-            //spriteBatch.DrawRectangleWithFill(Rectangle, 1, Color.Black, _hero.Color);
         }
 
         public void Resized()

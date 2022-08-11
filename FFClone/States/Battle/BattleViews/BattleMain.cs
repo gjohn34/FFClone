@@ -24,11 +24,6 @@ namespace FFClone.States.Battle.BattleViews
             Target = target;
             Action = action;
         }
-        //public int CalculateNewTotals()
-        //{
-        //    // fix this for other actions
-        //    //return Executor.CalculateBattleDamage();
-        //}
     }
     public enum BattleScene
     {
@@ -196,7 +191,6 @@ namespace FFClone.States.Battle.BattleViews
                             Target.BattleSprite.Position.X +(int)(0.5 * Target.BattleSprite.Width),
                             Target.BattleSprite.Position.Y +(int)(0.5 * Target.BattleSprite.Height)
                             )};
-                        //RoundActions.Find(x => x.Executor == Target).Done = true;
                         RoundActions.ForEach(x =>
                         {
                             if (x.Executor == Target || x.Target == Target)
@@ -377,7 +371,6 @@ namespace FFClone.States.Battle.BattleViews
                     {
                         options.Add(enemy);
                     }
-                    //vectors.Add(new Vector2(enemy.BattleSprite.Position.X, enemy.BattleSprite.Position.Y + (int)(0.5 * enemy.BattleSprite.Height)));
                 });
                 Prompt.Options = options;
                 Prompt.Resized();

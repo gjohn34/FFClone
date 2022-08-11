@@ -62,8 +62,6 @@ namespace FFClone.Controls
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             spriteBatch.DrawRectangleWithFill(Rectangle, 1, Color.Black, Selected ? FillColor : Color.MediumVioletRed);
-            //Primitives2D.DrawRectangle(spriteBatch, new Rectangle(Rectangle.X - 1, Rectangle.Y - 1, Rectangle.Width + 2, Rectangle.Height + 2), Color.Black);
-            //Primitives2D.FillRectangle(spriteBatch, Rectangle, Selected ? FillColor : Color.MediumVioletRed);
 
             if (!string.IsNullOrEmpty(Label))
             {
@@ -149,16 +147,12 @@ namespace FFClone.Controls
             foreach (IMenuOption menuItem in MenuItems)
                 menuItem.Draw(gameTime, spriteBatch);
 
-            //_selector.Draw(gameTime, spriteBatch);
         }
         public void Resized()
         {
             foreach (MenuItem menuItem in MenuItems)
             {
                 menuItem.Rectangle = GeneratePosition(MenuItems.IndexOf(menuItem), MenuItems.Count);
-                //menuItem.Rectangle = new Rectangle(Rectangle.X - menuItem.Rectangle.Width, menuItem.Rectangle.Y, Rectangle.Width, menuItem.Rectangle.Height);
-                //menuItem.Rectangle = new Rectangle(clientBounds.X - menuItem.Rectangle.Width, menuItem.Rectangle.Y, menuItem.Rectangle.Width, menuItem.Rectangle.Height);
-
             }
         }
 
@@ -182,7 +176,7 @@ namespace FFClone.Controls
 
         private Rectangle GeneratePosition(int index, int length)
         {
-            int spaceBetweenY, spaceBetweenX, cellHeight, cellWidth, initialYPos, initialXPos, pushDown, pushDown2;
+            int spaceBetweenY, spaceBetweenX, cellHeight, initialYPos, initialXPos, pushDown, pushDown2;
             double cellPositionPercentage;
             switch (_orientation)
             {
@@ -193,19 +187,12 @@ namespace FFClone.Controls
 
                     int availableHeight = Rectangle.Height;
                     int totalHeight = _minCellHeight * _rows;
-                    //if (totalHeight > availableHeight)
-                    //{
-                    //    // help me jesus
-                    //} else
-                    //{
                     availableHeight -= totalHeight;
-                    //}
 
                     spaceBetweenY = availableHeight / (_rows);
 
                     initialYPos = (int)Math.Floor((double)(index / _columns)) * _minCellHeight + Rectangle.Y + ((int)Math.Floor((double)(index / _columns)) * spaceBetweenY) + (int)(0.5 * spaceBetweenY);
                     initialXPos = ((index % _columns) * _minCellWidth) + Rectangle.X + ((index % _columns) * spaceBetweenX + (int)(0.5 * spaceBetweenX));
-                    //cellPositionPercentage = (double)index / (double)(length - 1);
 
 
                     Rectangle rect = new Rectangle(initialXPos, initialYPos, _minCellWidth, _minCellHeight);

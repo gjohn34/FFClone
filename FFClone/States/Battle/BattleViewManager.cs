@@ -18,7 +18,6 @@ namespace FFClone.States.Battle
         BattleViewManager()
         {
         }
-
         public static BattleViewManager Instance
         {
             get

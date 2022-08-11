@@ -17,7 +17,6 @@ namespace FFClone.Controls
         private int _vW;
         private SpriteFont _font;
         private string _label;
-        private MenuList _options;
         private EventHandler _onClose;
         private Vector2 _position;
 
@@ -80,13 +79,6 @@ namespace FFClone.Controls
 
         public void Update(GameTime gameTime)
         {
-            //KeyboardState ks = Keyboard.GetState();
-
-            //if (ks.IsKeyDown(Keys.Enter) && _previousKeyboard.IsKeyUp(Keys.Escape))
-            //{
-            //    _onClose.Invoke(this, new EventArgs());
-            //}
-            //_previousKeyboard = ks;
 
         }
     }
