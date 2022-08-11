@@ -246,7 +246,7 @@ namespace FFClone.States.Battle.BattleViews
                         _state = State.Gained;
                         break;
                     case State.Gained:
-                        string rewards = "";
+                        string rewards = "Enemies Dropped:\n";
                         Inventory items = new Inventory();
                         _enemies.ForEach(e =>
                         {
