@@ -1,4 +1,5 @@
 ﻿using FFClone.Controls;
+using FFClone.Helpers.Shapes;
 using FFClone.Models;
 using FFClone.Sprites;
 using FFClone.Transitions;
@@ -22,6 +23,7 @@ namespace FFClone.States
         private KeyboardState _previousKeyboardState;
         private EncounterInfo _encounterInfo;
         private Random _rand = new Random();
+        private decimal _foo = 0;
         internal MenuList menuList { 
             get
             {
@@ -105,7 +107,16 @@ namespace FFClone.States
             {
                 _stack.Peek().Draw(gameTime, spriteBatch);
             }
-            spriteBatch.DrawString(_font, _encounterInfo.Chance.ToString(), Vector2.Zero, Color.White);
+            spriteBatch.DrawString(_font, "Encounter Chance", Vector2.Zero, Color.White);
+            spriteBatch.DrawRectangleWithFill(new Rectangle(0, _font.LineSpacing, 30, 20), 0, Color.Black, Color.LightGreen);
+            spriteBatch.DrawRectangleWithFill(new Rectangle(30, _font.LineSpacing, 30, 20), 0, Color.Black, Color.YellowGreen);
+            spriteBatch.DrawRectangleWithFill(new Rectangle(60, _font.LineSpacing, 25, 20), 0, Color.Black, Color.Orange);
+            spriteBatch.DrawRectangleWithFill(new Rectangle(85, _font.LineSpacing, 15, 20), 0, Color.Black, Color.OrangeRed);
+            //spriteBatch.ProgressBar(_font, "Encounter Chance", foo, 1, ,,,false);
+            
+            //spriteBatch.ProgressBar(_font, "Encounter Chance", foo,, , ,,,false);
+            spriteBatch.ProgressBar(_font, "Encounter Chance", (int)Math.Floor(_encounterInfo.Ticks), 100, Color.Purple, Color.Transparent, new Rectangle(0, 0, 100, 20), false);
+
 
             spriteBatch.End();
             //Primitives2D.DrawRectangle(spriteBatch, new Rectangle(0, 0, 200, 200), Color.Black);
@@ -219,13 +230,25 @@ namespace FFClone.States
 
             if (generateEnc)
             {
-                _encounterInfo.Ticks += 0.02;
+                _encounterInfo.Ticks += 0.3;
 
-                _encounterInfo.Chance = _rand.NextDouble() + _encounterInfo.Ticks;
-                speed = 1;
-                if (_encounterInfo.Chance > speed + 2)
+                if (_encounterInfo.Ticks > 30 && _encounterInfo.Ticks < 60)
+                {
+                    _encounterInfo.Chance = _rand.Next(0, 90) + (0.3f * (int)Math.Floor(_encounterInfo.Ticks));
+                }
+                else if (_encounterInfo.Ticks > 60 && _encounterInfo.Ticks < 85)
+                {
+                    _encounterInfo.Chance = _rand.Next(0, 85) + (0.5f * (int)Math.Floor(_encounterInfo.Ticks));
+
+                } else if (_encounterInfo.Ticks > 85)
+                {
+                    _encounterInfo.Chance = _rand.Next(15, 100) + (int)Math.Floor(_encounterInfo.Ticks);
+
+                }
+                if (_encounterInfo.Chance > 100)
                 {
                     _encounterInfo.Ticks = 0;
+                    _encounterInfo.Chance = 0;
                     StateManager.Instance.Next(new BattleState(_game, _graphicsDevice, _content, this), Transition.NoTransition);
 
                 }
