@@ -1,4 +1,5 @@
 ﻿using FFClone.Controls;
+using FFClone.Helpers.Shapes;
 using FFClone.Models;
 using FFClone.Sprites;
 using Microsoft.Xna.Framework;
@@ -243,8 +244,9 @@ namespace FFClone.States.Battle.BattleViews
             // enemies
             _enemies.ForEach(enemy => {
                 enemy.BattleSprite.Draw(spriteBatch);
-                spriteBatch.DrawString(_font, $"{enemy.Name} {enemy.HP}/{enemy.MaxHP}", new Vector2(0, yOffset), Color.Black);
+                spriteBatch.ProgressBar(_font, enemy.Name, enemy.HP, enemy.MaxHP, Color.Green, Color.Red, new Rectangle(0, yOffset, 100, 20), false);
                 yOffset += _font.LineSpacing;
+                spriteBatch.DrawString(_font, $"{enemy.Name} {enemy.HP}/{enemy.MaxHP}", new Vector2(0, yOffset), Color.Black);
             });
 
             if (_hasPrompt)
