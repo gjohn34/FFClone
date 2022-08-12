@@ -7,18 +7,18 @@ using System.Text;
 
 namespace FFClone.Transitions
 {
-    public class FadeIn : Transition
+    public class FadeOut : Transition
     {
         private Color _color;
-        private Color _overlay;
-
-        public FadeIn(int totalFrames, Rectangle rectangle) : base(totalFrames, rectangle)
+        public FadeOut(int totalFrames, Rectangle rectangle) : base(totalFrames, rectangle)
         {
+            _color = new Color(Color.Black, 255);
         }
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             spriteBatch.Begin();
+            Primitives2D.FillRectangle(spriteBatch, Rectangle, _color);
             spriteBatch.End();
         }
 
@@ -30,6 +30,7 @@ namespace FFClone.Transitions
             if (Frame >= TotalFrames)
                 return;
 
+            _color = new Color(Color.Black, (float)((float)Frame / (float)TotalFrames) * -1 + 1);
         }
     }
 }

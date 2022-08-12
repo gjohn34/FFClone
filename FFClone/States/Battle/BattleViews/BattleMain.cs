@@ -2,6 +2,7 @@
 using FFClone.Helpers.Shapes;
 using FFClone.Models;
 using FFClone.Sprites;
+using FFClone.Transitions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -167,7 +168,11 @@ namespace FFClone.States.Battle.BattleViews
                         CurrentlyAnimating.Position.Y - Current.MoveByTick.Y
                     );
 
-                    if (Current.EndRectangle.Intersects(CurrentlyAnimating.Rectangle)) {
+                    if (Current.EndRectangle.Intersects(
+                        new Rectangle(
+                            new Point((int)CurrentlyAnimating.Position.X, (int)CurrentlyAnimating.Position.Y), 
+                            new Point(CurrentlyAnimating.Width, CurrentlyAnimating.Height)
+                        ))) {
                         BattleScene = BattleScene.DamageCalculation;
                         CurrentlyAnimating.Position = Current.HomePosition;
                     }
@@ -205,7 +210,15 @@ namespace FFClone.States.Battle.BattleViews
                     CurrentlyAnimating.Position = Current.HomePosition;
                     if (_battleModel.BattleOver)
                     {
-                        BattleViewManager.Instance.Next(new BattleVictory(_game, _graphicsDevice, _content, _battleModel));
+                        if (_party.TrueForAll(x => x.HP <= 0)) 
+                        {
+                            StateManager.Instance.Next(
+                                new MainMenuState(_game, _graphicsDevice, _content), new FadeOut(48, new Rectangle(0, 0, _vW, _vH))
+                            );
+                                break;
+
+                        }
+                        _stateManager.Next(new BattleVictory(_game, _graphicsDevice, _content, _battleModel));
                     }
                     if (RoundActions.TrueForAll(x => x.Done))
                     {

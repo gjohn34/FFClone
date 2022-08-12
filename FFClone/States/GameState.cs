@@ -107,14 +107,34 @@ namespace FFClone.States
                 _stack.Peek().Draw(gameTime, spriteBatch);
             }
             spriteBatch.DrawString(_font, "Encounter Chance", Vector2.Zero, Color.White);
-            spriteBatch.DrawRectangleWithFill(new Rectangle(0, _font.LineSpacing, 30, 20), 0, Color.Black, Color.LightGreen);
-            spriteBatch.DrawRectangleWithFill(new Rectangle(30, _font.LineSpacing, 30, 20), 0, Color.Black, Color.YellowGreen);
-            spriteBatch.DrawRectangleWithFill(new Rectangle(60, _font.LineSpacing, 25, 20), 0, Color.Black, Color.Orange);
-            spriteBatch.DrawRectangleWithFill(new Rectangle(85, _font.LineSpacing, 15, 20), 0, Color.Black, Color.OrangeRed);
+            float barLength = 0.2f * _vW;
+            spriteBatch.DrawRectangleWithFill(
+                new Rectangle(
+                    0, 
+                    _font.LineSpacing, 
+                    (int)(0.3f * barLength), 
+                    20), 0, Color.Black, Color.LightGreen);
+            spriteBatch.DrawRectangleWithFill(
+                new Rectangle(
+                    (int)(0.3f * barLength), 
+                    _font.LineSpacing,
+                    (int)(0.3f * barLength), 20), 0, Color.Black, Color.YellowGreen);
+            spriteBatch.DrawRectangleWithFill(
+                new Rectangle(
+                    2*(int)(0.3f * barLength), 
+                    _font.LineSpacing,
+                    (int)(0.25f * barLength), 20), 0, Color.Black, Color.Orange);
+            spriteBatch.DrawRectangleWithFill(
+                new Rectangle(
+                    2*(int)(0.3f * barLength) + (int)(0.25f * barLength), _font.LineSpacing, (int)(0.15f * barLength), 20), 0, Color.Black, Color.OrangeRed);
             //spriteBatch.ProgressBar(_font, "Encounter Chance", foo, 1, ,,,false);
             
             //spriteBatch.ProgressBar(_font, "Encounter Chance", foo,, , ,,,false);
-            spriteBatch.ProgressBar(_font, "Encounter Chance", (int)Math.Floor(_encounterInfo.Ticks), 100, Color.Purple, Color.Transparent, new Rectangle(0, 0, 100, 20), false);
+            spriteBatch.ProgressBar(
+                _font, 
+                "Encounter Chance", 
+                (int)Math.Floor(_encounterInfo.Ticks), 100, Color.Purple, Color.Transparent, 
+                new Rectangle(0, 0, (int)barLength, 20), false);
 
 
             spriteBatch.End();
@@ -230,27 +250,20 @@ namespace FFClone.States
             if (generateEnc)
             {
                 _encounterInfo.Ticks += 0.3;
-                float increment = 0;
 
                 if (_encounterInfo.Ticks > 30 && _encounterInfo.Ticks < 60)
                 {
-                    increment = 0.3f * (int)Math.Floor(_encounterInfo.Ticks);
-                    _encounterInfo.Chance = _rand.Next(0, 80);
+                    _encounterInfo.Chance = _rand.Next(0, 80) + 0.3f * (int)Math.Floor(_encounterInfo.Ticks);
                 }
                 else if (_encounterInfo.Ticks >= 60 && _encounterInfo.Ticks < 85)
                 {
-                    increment = 0.4f * (int)Math.Floor(_encounterInfo.Ticks);
-
-                    _encounterInfo.Chance = _rand.Next(0, 75);
+                    _encounterInfo.Chance = _rand.Next(0, 75) + 0.4f * (int)Math.Floor(_encounterInfo.Ticks);
 
                 } else if (_encounterInfo.Ticks >= 85)
                 {
-                    increment = 0.5f * (int)Math.Floor(_encounterInfo.Ticks);
-
-                    _encounterInfo.Chance = _rand.Next(15, 100);
-
+                    _encounterInfo.Chance = _rand.Next(15, 100) + 0.5f * (int)Math.Floor(_encounterInfo.Ticks);
                 }
-                if (_encounterInfo.Chance + (int)increment > 100)
+                if (_encounterInfo.Chance > 100)
                 {
                     _encounterInfo.Ticks = 0;
                     _encounterInfo.Chance = 0;
@@ -265,6 +278,10 @@ namespace FFClone.States
             _player.Facing = facing;
             _player.Playing = playing;
             _player.Update(gameTime);
+        }
+        public override void Resized()
+        {
+            base.Resized();
         }
     }
 }

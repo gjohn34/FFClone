@@ -130,7 +130,7 @@ namespace FFClone.States.Battle.BattleViews
             }
             if (_stopwatch.IsRunning)
             {
-                if (_stopwatch.ElapsedMilliseconds >= 2000)
+                if (_stopwatch.ElapsedMilliseconds >= 1500)
                 {
                     _stats = new Dictionary<string, string>
                     {

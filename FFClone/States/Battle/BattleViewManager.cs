@@ -33,10 +33,10 @@ namespace FFClone.States.Battle
             }
         }
 
+
         public void Done()
         {
-            StateManager.Instance.Next(_previous, new NoTransition()) ;
-            //StateManager.Instance.Next(_previous, new FadeIn(48, rectangle));
+            StateManager.Instance.Next(_previous, Transition.NoTransition) ;
             _current = null;
             _next = null;
         }

@@ -46,7 +46,7 @@ namespace FFClone.States
                                 })
                         };
 
-                        Rectangle r = new Rectangle((int)(0.3f * _vW), (int)(0.3f * _vH), (int)(0.3f * _vW), (int)(0.3f * _vH));
+                        Rectangle r = new Rectangle((int)(0.33f * _vW), (int)(0.33f * _vH), (int)(0.33f * _vW), (int)(0.33f * _vH));
 
                         Rectangle y = new Rectangle(
                             r.X,
@@ -70,7 +70,7 @@ namespace FFClone.States
                     }),
                 new MenuOption("Delete Save", (a, e) => { SaveFile.Destroy(); }),
                 new MenuOption("Help", (a, e) => {
-                    string label= "Hello there:\nControls are arrows keys for selections\nGray is the selected option\nEnter key to confirm selction\nEscape to cancel/close modal\n\nRight-shift opens up in-game menu\n\nDummy party has a full party";
+                    string label= "Hello there:\nControls are arrows keys for selections\nGray is the selected option\nEnter key to confirm selction\nEscape to cancel/close modal\n\nRight-shift opens up in-game menu\n\nDummy party has a full party\nLocked at 800*480 until I fix an issue with resizing.";
                         _stack.Push(new Modal(
                             _font,
                             label,
@@ -145,6 +145,7 @@ namespace FFClone.States
 
         public override void Resized()
         {
+            base.Resized();
             int width = (int)Math.Ceiling(_vW * 0.2);
             _menuList.Rectangle = new Rectangle(_vW - width, 0, width, _vH);
             _menuList.Resized();

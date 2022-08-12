@@ -18,14 +18,18 @@ namespace FFClone
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
-            Window.AllowUserResizing = true;
+            Window.AllowUserResizing = false;
         }
 
         protected override void Initialize()
         {
             IsFixedTimeStep = true;
             TargetElapsedTime = System.TimeSpan.FromSeconds(1d / 24);
-            Window.ClientSizeChanged += Window_ClientSizeChanged;
+            _graphics.PreferredBackBufferWidth = 800;
+            _graphics.PreferredBackBufferHeight = 640;
+            // Enable when I figure out the map movement
+            //Window.ClientSizeChanged += Window_ClientSizeChanged;
+
             base.Initialize();
         }
 
