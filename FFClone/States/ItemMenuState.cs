@@ -9,6 +9,8 @@ using Microsoft.Xna.Framework.Input;
 using System.Diagnostics;
 using MonoGame;
 using FFClone.Helpers.Shapes;
+using FFClone.Transitions;
+using System.Reflection.Emit;
 
 namespace FFClone.States
 {
@@ -128,12 +130,13 @@ namespace FFClone.States
         private MenuList _portraitList;
         private Stack<IComponent> _stack;
         private ConfirmationModal _modal;
+        private bool _noItems = false;
 
         public ItemMenuState(Game1 game, GraphicsDevice graphicsDevice, ContentManager content) : base(game, graphicsDevice, content)
         {
             _stack = new Stack<IComponent>();
 
-            Rectangle modalR = new Rectangle((int)(0.3f * _vW), (int)(0.3f * _vH), (int)(0.3f * _vW), (int)(0.3f * _vH));
+            Rectangle modalR = new Rectangle((int)(0.33f * _vW), (int)(0.33f * _vH), (int)(0.33f * _vW), (int)(0.33f * _vH));
 
             Rectangle portraitsGroupRectangle = new Rectangle(
                 modalR.X,
@@ -165,11 +168,47 @@ namespace FFClone.States
                 );
             } else
             {
-                _list = null;
-                _stack.Push(new TestComponent(new Rectangle(0, 0, 100, 100), "none", _font));
+                NoItems();
+
+                //_stack.Push(new TestComponent(new Rectangle(0, 0, 100, 100), "none", _font));
             }
         }
 
+        private void NoItems()
+        {
+            _stack.Clear();
+            _list = null;
+            string label = "No items left\nGo back?\n";
+            List<IMenuOption> list = new List<IMenuOption>
+                        {
+                            new MenuItem("yes", _font, (a,b) => {
+                                _stateManager.Back();
+                                _stack.Pop();
+                                }),
+                            new MenuItem("no",_font, (a,b) =>
+                                {
+                                    _stack.Pop();
+                                    _noItems = true;
+                                })
+                        };
+
+            Rectangle r = new Rectangle((int)(0.33f * _vW), (int)(0.33f * _vH), (int)(0.33f * _vW), (int)(0.33f * _vH));
+
+            Rectangle y = new Rectangle(
+                r.X,
+                r.Y + (int)(_font.MeasureString(label).Y),
+                r.Width,
+                (int)(r.Height - _font.MeasureString(label).Y)
+            );
+
+            MenuList menulist = new MenuList(list, y, _font, Orientation.Horizontal, list.Count);
+            _stack.Push(new ConfirmationModal(
+                _font,
+                label,
+                menulist,
+                _game.Window.ClientBounds
+            ));
+        }
         public void Handler(Item item)
         {
             _portraits.ForEach(mo => mo.OnSubmit = (a,b) => { 
@@ -186,9 +225,7 @@ namespace FFClone.States
                         _list.Refresh(newList);
                     } else
                     {
-                        _stack.Clear();
-                        _list = null;
-                        _stack.Push(new TestComponent(new Rectangle(0, 0, 100, 100), "none", _font));
+                        NoItems();
                     }
                     //_list = new MenuList(
                     //    _inventory.Items.ConvertAll<IMenuOption>(x => new MenuItem(x.Name, _font, (a, b) => Handler(x))),
@@ -218,6 +255,19 @@ namespace FFClone.States
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             spriteBatch.Begin();
+            spriteBatch.DrawLine(new Vector2(0, 0.5f * _vH), new Vector2(_vW, 0.5f * _vH), Color.Black);
+            spriteBatch.DrawLine(new Vector2(0.5f * _vW, 0), new Vector2(0.5f * _vW, _vH), Color.Black);
+            if (_noItems)
+            {
+                spriteBatch.DrawRectangleWithFill(new Rectangle(0,0, _vW, _vH), 1, Color.Black, Color.White);
+                spriteBatch.DrawString(
+                    _font, 
+                    "Empty Bag", 
+                    new Vector2(
+                        (0.5f * _vW) - (0.5f * _font.MeasureString("Empty Bag").X),
+                        (0.5f * _vH) - (0.5f * _font.LineSpacing)), 
+                    Color.Black);
+            }
             if (_list != null)
             {
                 _list.Draw(gameTime, spriteBatch);

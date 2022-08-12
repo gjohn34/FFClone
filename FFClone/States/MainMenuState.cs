@@ -19,7 +19,6 @@ namespace FFClone.States
         private Texture2D _background;
         private Stack<IComponent> _stack = new Stack<IComponent>();
 
-
         public MainMenuState(Game1 game, GraphicsDevice graphicsDevice, ContentManager content) : base(game, graphicsDevice, content)
         {
             List<IMenuOption> options = new List<IMenuOption> {
@@ -70,10 +69,23 @@ namespace FFClone.States
                     _stateManager.Next(new GameState(_game, _graphicsDevice, _content), Transition.NoTransition);
                     }),
                 new MenuOption("Delete Save", (a, e) => { SaveFile.Destroy(); }),
-                new MenuOption("Help", (a, e) => { }),
-                new MenuOption("Credit To", (a,e) => {
-                    _stateManager.Next(new CreditsState(_game, _graphicsDevice, _content), Transition.NoTransition);
-                })
+                new MenuOption("Help", (a, e) => {
+                    string label= "Hello there:\nControls are arrows keys for selections\nGray is the selected option\nEnter key to confirm selction\nEscape to cancel/close modal\n\nRight-shift opens up in-game menu\n\nDummy party has a full party";
+                        _stack.Push(new Modal(
+                            _font,
+                            label,
+                            _game.Window.ClientBounds,
+                            new Rectangle(
+                                (int)(0.2f * _vW),
+                                (int)(0.2f * _vH),
+                                (int)(0.6f * _vW),
+                                (int)(0.6f * _vH)
+                            ),
+                            (a, b) => {
+                                _stack.Pop();
+                            }
+                        ));
+                }),
             };
 
             int width = (int)Math.Ceiling(_game.Window.ClientBounds.Width * 0.2);

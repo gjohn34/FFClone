@@ -30,7 +30,7 @@ namespace FFClone.States
                 {
                     new MenuItem("Party", _font, (object a, EventArgs e) => _stateManager.Next(new PartyMenuState(_game, _graphicsDevice, _content), Transition.NoTransition)),
                     new MenuItem("Items",  _font,(object a, EventArgs e) => _stateManager.Next(new ItemMenuState(_game, _graphicsDevice, _content), Transition.NoTransition)),
-                    new MenuItem("Config", _font,(a, e) => { }),
+                    //new MenuItem("Config", _font,(a, e) => { }),
                     new MenuItem("Main Menu", _font,(a, e) => { _stateManager.Next(new MainMenuState(_game, _graphicsDevice, _content), Transition.NoTransition); }),
                     new MenuItem("Save",  _font,(object a, EventArgs e) => {
                         string label = "Overwrite existing save data?";
@@ -141,7 +141,7 @@ namespace FFClone.States
             Facing facing = _player.Facing;
             bool charMove = false;
             bool generateEnc = false;
-            if (keyboardState.IsKeyUp(Keys.Enter) && _previousKeyboardState.IsKeyDown(Keys.Enter))
+            if (keyboardState.IsKeyUp(Keys.RightShift) && _previousKeyboardState.IsKeyDown(Keys.RightShift))
             {
                 _stack.Push(MenuList);
                 // open up menu

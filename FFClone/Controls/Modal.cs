@@ -98,7 +98,8 @@ namespace FFClone.Controls
             Open = true;
             _vW = gameWindow.Width;
             _vH = gameWindow.Height;
-            Rectangle = new Rectangle((int)(0.3f * _vW), (int)(0.3f * _vH), (int)(0.3f * _vW), (int)(0.3f * _vH));
+            Rectangle = new Rectangle((int)(0.33f * _vW), (int)(0.33f * _vH), (int)(0.33f * _vW), (int)(0.33f * _vH));
+
             _font = font;
             Label = WrapText(label);
             _margin = ((int)(Rectangle.Width - _font.MeasureString(Label).X) - (2 * 5)) / 2; // left and right border -5
