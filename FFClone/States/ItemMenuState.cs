@@ -131,9 +131,12 @@ namespace FFClone.States
         private Stack<IComponent> _stack;
         private ConfirmationModal _modal;
         private bool _noItems = false;
+        private Texture2D _background;
 
         public ItemMenuState(Game1 game, GraphicsDevice graphicsDevice, ContentManager content) : base(game, graphicsDevice, content)
         {
+            _background = content.Load<Texture2D>("Sprites/Backgrounds/party-screen");
+
             _stack = new Stack<IComponent>();
 
             Rectangle modalR = new Rectangle((int)(0.33f * _vW), (int)(0.33f * _vH), (int)(0.33f * _vW), (int)(0.33f * _vH));
@@ -255,8 +258,8 @@ namespace FFClone.States
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             spriteBatch.Begin();
-            spriteBatch.DrawLine(new Vector2(0, 0.5f * _vH), new Vector2(_vW, 0.5f * _vH), Color.Black);
-            spriteBatch.DrawLine(new Vector2(0.5f * _vW, 0), new Vector2(0.5f * _vW, _vH), Color.Black);
+            spriteBatch.Draw(_background, new Rectangle(0, 0, _vW, _vH), Color.White);
+
             if (_noItems)
             {
                 spriteBatch.DrawRectangleWithFill(new Rectangle(0,0, _vW, _vH), 1, Color.Black, Color.White);

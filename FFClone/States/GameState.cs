@@ -230,21 +230,27 @@ namespace FFClone.States
             if (generateEnc)
             {
                 _encounterInfo.Ticks += 0.3;
+                float increment = 0;
 
                 if (_encounterInfo.Ticks > 30 && _encounterInfo.Ticks < 60)
                 {
-                    _encounterInfo.Chance = _rand.Next(0, 90) + (0.3f * (int)Math.Floor(_encounterInfo.Ticks));
+                    increment = 0.3f * (int)Math.Floor(_encounterInfo.Ticks);
+                    _encounterInfo.Chance = _rand.Next(0, 80);
                 }
-                else if (_encounterInfo.Ticks > 60 && _encounterInfo.Ticks < 85)
+                else if (_encounterInfo.Ticks >= 60 && _encounterInfo.Ticks < 85)
                 {
-                    _encounterInfo.Chance = _rand.Next(0, 85) + (0.5f * (int)Math.Floor(_encounterInfo.Ticks));
+                    increment = 0.4f * (int)Math.Floor(_encounterInfo.Ticks);
 
-                } else if (_encounterInfo.Ticks > 85)
+                    _encounterInfo.Chance = _rand.Next(0, 75);
+
+                } else if (_encounterInfo.Ticks >= 85)
                 {
-                    _encounterInfo.Chance = _rand.Next(15, 100) + (int)Math.Floor(_encounterInfo.Ticks);
+                    increment = 0.5f * (int)Math.Floor(_encounterInfo.Ticks);
+
+                    _encounterInfo.Chance = _rand.Next(15, 100);
 
                 }
-                if (_encounterInfo.Chance > 100)
+                if (_encounterInfo.Chance + (int)increment > 100)
                 {
                     _encounterInfo.Ticks = 0;
                     _encounterInfo.Chance = 0;
