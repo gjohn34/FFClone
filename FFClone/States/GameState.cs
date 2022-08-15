@@ -48,7 +48,7 @@ namespace FFClone.States
                                 })
                         };
 
-                        Rectangle r = new Rectangle((int)(0.3f * _vW), (int)(0.3f * _vH), (int)(0.3f * _vW), (int)(0.3f * _vH));
+                        Rectangle r = new Rectangle((int)(0.33f * _vW), (int)(0.33f * _vH), (int)(0.33f * _vW), (int)(0.33f * _vH));
 
                         Rectangle y = new Rectangle(
                             r.X,

@@ -21,7 +21,7 @@ namespace FFClone.Models
 
         private void GenerateReward()
         {
-            Reward = new Item(1, "A new car!", 1);
+            Reward = new Item(66, "A new car!", 1);
         }
 
         private void GenerateStats(Dictionary<string, int> statBlock)

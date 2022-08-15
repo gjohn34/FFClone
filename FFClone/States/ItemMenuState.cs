@@ -162,7 +162,8 @@ namespace FFClone.States
             if (newList.Count > 0)
             {
                 _list = new MenuList(
-                    _inventory.Items.ConvertAll<IMenuOption>(x => new MenuItem(x.Name, _font, (a,b) => Handler(x))),
+                    newList,
+                    //_inventory.Items.ConvertAll<IMenuOption>(x => new MenuItem(x.Name, _font, (a,b) => Handler(x))),
                     new Rectangle((int)(0.1 * _vW), (int)(0.1 * _vH), _vW - (int)(0.2 * _vW), _vH - (int)(0.2 * _vH)),
                     _font,
                     //Handler,

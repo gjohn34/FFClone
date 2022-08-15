@@ -22,14 +22,15 @@ namespace FFClone.Models
             if (index == -1)
             {
                 Items.Add(item);
-                return;
+                //return;
+            } else
+            {
+                Items[index].Quantity += item.Quantity;
             }
-
-            Items[GetIndex(item)].Quantity += item.Quantity;
         }
-        public void Merge(Inventory inventory)
+        public void Merge(Inventory subInventory)
         {
-            inventory.Items.ForEach(x => Items.Add(x));
+            subInventory.Items.ForEach(x => Add(x));
         }
 
         public bool Remove(Item item)
